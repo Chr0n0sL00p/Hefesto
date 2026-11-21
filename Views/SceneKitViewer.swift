@@ -1,6 +1,6 @@
 //
 //  SceneKitViewer.swift
-//  StarkHUD - Visor 3D Metal / SceneKit con Despiece y Aislamiento Rayos-X
+//  Hefesto - Visor 3D Metal / SceneKit con Despiece y Aislamiento Rayos-X
 //
 
 import SwiftUI

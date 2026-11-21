@@ -1,6 +1,6 @@
 //
 //  BlueprintDetailView.swift
-//  StarkHUD - Vista Principal del Plano 3D Interactivo
+//  Hefesto - Vista Principal del Plano 3D Interactivo
 //
 
 import SwiftUI

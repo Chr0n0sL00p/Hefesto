@@ -1,6 +1,6 @@
 //
 //  BlueprintModels.swift
-//  StarkHUD - Receptor Holográfico de Ingeniería para iPhone 16
+//  Hefesto - Receptor Holográfico de Ingeniería para iPhone 16
 //
 
 import Foundation

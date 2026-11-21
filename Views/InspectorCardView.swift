@@ -1,6 +1,6 @@
 //
 //  InspectorCardView.swift
-//  StarkHUD - Ficha Técnica de Ingeniería y Diagnóstico
+//  Hefesto - Ficha Técnica de Ingeniería y Diagnóstico
 //
 
 import SwiftUI

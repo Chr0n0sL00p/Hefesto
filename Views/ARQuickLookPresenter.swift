@@ -1,6 +1,6 @@
 //
 //  ARQuickLookPresenter.swift
-//  StarkHUD - Integración Nativa con Apple AR QuickLook
+//  Hefesto - Integración Nativa con Apple AR QuickLook
 //
 
 import SwiftUI

@@ -1,6 +1,6 @@
 //
 //  CatalogView.swift
-//  StarkHUD - Catálogo Dinámico de Modelos 3D de Odiseo
+//  Hefesto - Catálogo Dinámico de Modelos 3D de Odiseo
 //
 
 import SwiftUI
@@ -146,7 +146,7 @@ public struct CatalogView: View {
                         .disableAutocorrection(true)
                 }
 
-                Section(footer: Text("StarkHUD se conecta por Tailscale a Odiseo. Cuando pidas un aparato en Telegram, aparecerá automáticamente aquí al refrescar.")) {
+                Section(footer: Text("Hefesto se conecta por Tailscale a Odiseo. Cuando pidas un aparato en Telegram, aparecerá automáticamente aquí al refrescar.")) {
                     Button("Guardar y Probar Conexión") {
                         apiService.serverHost = tempHost
                         showSettings = false

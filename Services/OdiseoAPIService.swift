@@ -1,6 +1,6 @@
 //
 //  OdiseoAPIService.swift
-//  StarkHUD - Cliente de Red Tailscale & Gestor de Modelos 3D
+//  Hefesto - Cliente de Red Tailscale & Gestor de Modelos 3D
 //
 
 import Foundation

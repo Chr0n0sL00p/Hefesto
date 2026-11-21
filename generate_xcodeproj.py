@@ -91,7 +91,7 @@ def create_xcodeproj(project_dir="/home/snow/Hefesto"):
     content += f"\t\t{id_group_products} /* Products */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n\t\t\t\t{id_product_app} /* Hefesto.app */,\n\t\t\t);\n\t\t\tname = Products;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
 
     src_children = "\n".join([f"\t\t\t\t{f_id} /* {name} */," for f_id, name, _ in file_refs])
-    content += f"\t\t{id_group_src} /* Hefesto */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n{src_children}\n\t\t\t\t{id_assets_ref} /* Assets.xcassets */,\n\t\t\t\t{id_plist_ref} /* Info.plist */,\n\t\t\t);\n\t\t\tpath = Hefesto;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
+    content += f"\t\t{id_group_src} /* Hefesto */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n{src_children}\n\t\t\t\t{id_assets_ref} /* Assets.xcassets */,\n\t\t\t\t{id_plist_ref} /* Info.plist */,\n\t\t\t);\n\t\t\tname = Hefesto;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
 
     content += """/* End PBXGroup section */
 
@@ -120,19 +120,19 @@ def create_xcodeproj(project_dir="/home/snow/Hefesto"):
 \t\t\tisa = PBXProject;
 \t\t\tattributes = {{
 \t\t\t\tBuildIndependentTargetsInParallel = 1;
-\t\t\t\tLastUpgradeCheck = 1520;
+\t\t\t\tLastUpgradeCheck = 1540;
 \t\t\t\tTargetAttributes = {{
 \t\t\t\t\t{id_target} = {{
-\t\t\t\t\t\tCreatedOnToolsVersion = 15.2;
+\t\t\t\t\t\tCreatedOnToolsVersion = 15.4;
 \t\t\t\t\t}};
 \t\t\t\t}};
 \t\t\t}};
 \t\t\tbuildConfigurationList = {id_config_list_proj} /* Build configuration list for PBXProject "Hefesto" */;
 \t\t\tcompatibilityVersion = "Xcode 14.0";
-\t\t\tdevelopmentRegion = es;
+\t\t\tdevelopmentRegion = en;
 \t\t\thasScannedForEncodings = 0;
 \t\t\tknownRegions = (
-\t\t\t\tes,
+\t\t\t\ten,
 \t\t\t\tBase,
 \t\t\t);
 \t\t\tmainGroup = {id_group_main};
@@ -294,6 +294,93 @@ def create_xcodeproj(project_dir="/home/snow/Hefesto"):
     with open(pbx_path, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"Hefesto.xcodeproj generado exitosamente en: {pbx_path}")
+
+    # Create shared scheme
+    xcscheme_dir = os.path.join(xcodeproj_dir, "xcshareddata", "xcschemes")
+    os.makedirs(xcscheme_dir, exist_ok=True)
+    scheme_path = os.path.join(xcscheme_dir, "Hefesto.xcscheme")
+    scheme_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1540"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "{id_target}"
+               BuildableName = "Hefesto.app"
+               BlueprintName = "Hefesto"
+               ReferencedContainer = "container:Hefesto.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "{id_target}"
+            BuildableName = "Hefesto.app"
+            BlueprintName = "Hefesto"
+            ReferencedContainer = "container:Hefesto.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "{id_target}"
+            BuildableName = "Hefesto.app"
+            BlueprintName = "Hefesto"
+            ReferencedContainer = "container:Hefesto.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>
+"""
+    with open(scheme_path, "w", encoding="utf-8") as f:
+        f.write(scheme_content)
+    print(f"Hefesto.xcscheme generado exitosamente en: {scheme_path}")
 
 if __name__ == "__main__":
     create_xcodeproj()
