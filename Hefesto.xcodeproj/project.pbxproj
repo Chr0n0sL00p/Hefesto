@@ -1,0 +1,279 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CD226CADAF914DE49C6DF3E8 /* HefestoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED403687FD14803BFC191AC /* HefestoApp.swift */; };
+		D699897FB7BB4A079A883648 /* BlueprintModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A203353A2EA47B7BFF40B66 /* BlueprintModels.swift */; };
+		1697784F7D5B43A9AA4F5F1C /* OdiseoAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD9BAC4DCC74CDE9202FA74 /* OdiseoAPIService.swift */; };
+		112030C7D1614D12AE420C19 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8D642562C47B49570DA49 /* CatalogView.swift */; };
+		21C3D4BDBF5D4F4FA1F2CD51 /* BlueprintDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78FECDEB0A6146ABA182CA21 /* BlueprintDetailView.swift */; };
+		B512D373478C4290A64E868C /* SceneKitViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995268720B0C4315A87069F6 /* SceneKitViewer.swift */; };
+		B10DE756989141D88D01D5A8 /* InspectorCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38F1F968FCEB4AEDB5A04EDB /* InspectorCardView.swift */; };
+		DE9097E1C16443699A11C501 /* ARQuickLookPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26639A7890B74C6ABFC065C7 /* ARQuickLookPresenter.swift */; };
+		AC6C69F42BDF4B2DAD5A5965 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 03CD81C8BAE241D8A6FA885D /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6B386122393C4486BCF4A543 /* Hefesto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hefesto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2ED403687FD14803BFC191AC /* HefestoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/HefestoApp.swift"; sourceTree = "<group>"; };
+		0A203353A2EA47B7BFF40B66 /* BlueprintModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/BlueprintModels.swift"; sourceTree = "<group>"; };
+		3BD9BAC4DCC74CDE9202FA74 /* OdiseoAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/OdiseoAPIService.swift"; sourceTree = "<group>"; };
+		7BA8D642562C47B49570DA49 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CatalogView.swift"; sourceTree = "<group>"; };
+		78FECDEB0A6146ABA182CA21 /* BlueprintDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/BlueprintDetailView.swift"; sourceTree = "<group>"; };
+		995268720B0C4315A87069F6 /* SceneKitViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/SceneKitViewer.swift"; sourceTree = "<group>"; };
+		38F1F968FCEB4AEDB5A04EDB /* InspectorCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/InspectorCardView.swift"; sourceTree = "<group>"; };
+		26639A7890B74C6ABFC065C7 /* ARQuickLookPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ARQuickLookPresenter.swift"; sourceTree = "<group>"; };
+		54C62E98E5CB4E65992BF08A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		03CD81C8BAE241D8A6FA885D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3F49F5EFC96442E9ACB8BDC8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4C22C8287C7D4D13BE175C9E = {
+			isa = PBXGroup;
+			children = (
+				286A69B563F04A2CAD0A7E9C /* Hefesto */,
+				1611BEB9D3BB4DC392B68F72 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1611BEB9D3BB4DC392B68F72 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6B386122393C4486BCF4A543 /* Hefesto.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		286A69B563F04A2CAD0A7E9C /* Hefesto */ = {
+			isa = PBXGroup;
+			children = (
+				2ED403687FD14803BFC191AC /* HefestoApp.swift */,
+				0A203353A2EA47B7BFF40B66 /* BlueprintModels.swift */,
+				3BD9BAC4DCC74CDE9202FA74 /* OdiseoAPIService.swift */,
+				7BA8D642562C47B49570DA49 /* CatalogView.swift */,
+				78FECDEB0A6146ABA182CA21 /* BlueprintDetailView.swift */,
+				995268720B0C4315A87069F6 /* SceneKitViewer.swift */,
+				38F1F968FCEB4AEDB5A04EDB /* InspectorCardView.swift */,
+				26639A7890B74C6ABFC065C7 /* ARQuickLookPresenter.swift */,
+				03CD81C8BAE241D8A6FA885D /* Assets.xcassets */,
+				54C62E98E5CB4E65992BF08A /* Info.plist */,
+			);
+			path = Hefesto;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00A541A9DC8E48279F75208B /* Hefesto */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9AE806746AD94F41BFAB1E9E /* Build configuration list for PBXNativeTarget "Hefesto" */;
+			buildPhases = (
+				6AB6530B699D4FB78369F72E /* Sources */,
+				3F49F5EFC96442E9ACB8BDC8 /* Frameworks */,
+				572EF36CF2CD417B9BBBF0B1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Hefesto;
+			productName = Hefesto;
+			productReference = 6B386122393C4486BCF4A543 /* Hefesto.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8ED6A6F995A54868BFEC51FA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					00A541A9DC8E48279F75208B = {
+						CreatedOnToolsVersion = 15.2;
+					};
+				};
+			};
+			buildConfigurationList = 2DB5384B556E462792011F1C /* Build configuration list for PBXProject "Hefesto" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				es,
+				Base,
+			);
+			mainGroup = 4C22C8287C7D4D13BE175C9E;
+			productRefGroup = 1611BEB9D3BB4DC392B68F72 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00A541A9DC8E48279F75208B /* Hefesto */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		572EF36CF2CD417B9BBBF0B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC6C69F42BDF4B2DAD5A5965 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6AB6530B699D4FB78369F72E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD226CADAF914DE49C6DF3E8 /* HefestoApp.swift in Sources */,
+				D699897FB7BB4A079A883648 /* BlueprintModels.swift in Sources */,
+				1697784F7D5B43A9AA4F5F1C /* OdiseoAPIService.swift in Sources */,
+				112030C7D1614D12AE420C19 /* CatalogView.swift in Sources */,
+				21C3D4BDBF5D4F4FA1F2CD51 /* BlueprintDetailView.swift in Sources */,
+				B512D373478C4290A64E868C /* SceneKitViewer.swift in Sources */,
+				B10DE756989141D88D01D5A8 /* InspectorCardView.swift in Sources */,
+				DE9097E1C16443699A11C501 /* ARQuickLookPresenter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		68C137D970CD463ABC99B8CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5065F57AD0E14D488E282282 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		83360AA5B1F5487E8C8F5CBE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Hefesto;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.odiseo.hefesto;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D61CACA769D64CD1903B44E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Hefesto;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.odiseo.hefesto;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2DB5384B556E462792011F1C /* Build configuration list for PBXProject "Hefesto" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				68C137D970CD463ABC99B8CE /* Debug */,
+				5065F57AD0E14D488E282282 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9AE806746AD94F41BFAB1E9E /* Build configuration list for PBXNativeTarget "Hefesto" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83360AA5B1F5487E8C8F5CBE /* Debug */,
+				D61CACA769D64CD1903B44E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 8ED6A6F995A54868BFEC51FA /* Project object */;
+}

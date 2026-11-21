@@ -88,7 +88,7 @@ public struct CatalogView: View {
                     }
                 }
             }
-            .navigationTitle("ODISEO // 3D HUD")
+            .navigationTitle("HEFESTO // 3D HUD")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generador automático de StarkHUD.xcodeproj/project.pbxproj
+Generador automático de Hefesto.xcodeproj/project.pbxproj
 Compatible con Xcode 15/16 y macOS CI Runners (GitHub Actions).
 """
 
@@ -11,12 +11,11 @@ import uuid
 def gen_id():
     return uuid.uuid4().hex[:24].upper()
 
-def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
-    xcodeproj_dir = os.path.join(project_dir, "StarkHUD.xcodeproj")
+def create_xcodeproj(project_dir="/home/snow/Hefesto"):
+    xcodeproj_dir = os.path.join(project_dir, "Hefesto.xcodeproj")
     os.makedirs(xcodeproj_dir, exist_ok=True)
     pbx_path = os.path.join(xcodeproj_dir, "project.pbxproj")
 
-    # Identificadores únicos
     id_proj = gen_id()
     id_target = gen_id()
     id_group_main = gen_id()
@@ -33,9 +32,8 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
     id_debug_target = gen_id()
     id_release_target = gen_id()
 
-    # Archivos fuentes
     swift_files = [
-        ("StarkHUDApp.swift", "App/StarkHUDApp.swift"),
+        ("HefestoApp.swift", "App/HefestoApp.swift"),
         ("BlueprintModels.swift", "Models/BlueprintModels.swift"),
         ("OdiseoAPIService.swift", "Services/OdiseoAPIService.swift"),
         ("CatalogView.swift", "Views/CatalogView.swift"),
@@ -55,8 +53,9 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
         build_files.append((b_id, f_id, name))
 
     id_plist_ref = gen_id()
+    id_assets_ref = gen_id()
+    id_assets_build = gen_id()
 
-    # Construir contenido pbxproj
     content = f"""// !$*UTF8*$!
 {{
 	archiveVersion = 1;
@@ -69,14 +68,16 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 """
     for b_id, f_id, name in build_files:
         content += f"\t\t{b_id} /* {name} in Sources */ = {{isa = PBXBuildFile; fileRef = {f_id} /* {name} */; }};\n"
+    content += f"\t\t{id_assets_build} /* Assets.xcassets in Resources */ = {{isa = PBXBuildFile; fileRef = {id_assets_ref} /* Assets.xcassets */; }};\n"
 
     content += """/* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-\t\t""" + f"{id_product_app} /* StarkHUD.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarkHUD.app; sourceTree = BUILT_PRODUCTS_DIR; }};\n"
+\t\t""" + f"{id_product_app} /* Hefesto.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hefesto.app; sourceTree = BUILT_PRODUCTS_DIR; }};\n"
     for f_id, name, rel_path in file_refs:
         content += f"\t\t{f_id} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = \"{rel_path}\"; sourceTree = \"<group>\"; }};\n"
     content += f"\t\t{id_plist_ref} /* Info.plist */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = \"<group>\"; }};\n"
+    content += f"\t\t{id_assets_ref} /* Assets.xcassets */ = {{isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = \"<group>\"; }};\n"
 
     content += """/* End PBXFileReference section */
 
@@ -85,19 +86,19 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
     content += """/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-\t\t""" + f"{id_group_main} = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n\t\t\t\t{id_group_src} /* StarkHUD */,\n\t\t\t\t{id_group_products} /* Products */,\n\t\t\t);\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
+\t\t""" + f"{id_group_main} = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n\t\t\t\t{id_group_src} /* Hefesto */,\n\t\t\t\t{id_group_products} /* Products */,\n\t\t\t);\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
     
-    content += f"\t\t{id_group_products} /* Products */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n\t\t\t\t{id_product_app} /* StarkHUD.app */,\n\t\t\t);\n\t\t\tname = Products;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
+    content += f"\t\t{id_group_products} /* Products */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n\t\t\t\t{id_product_app} /* Hefesto.app */,\n\t\t\t);\n\t\t\tname = Products;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
 
     src_children = "\n".join([f"\t\t\t\t{f_id} /* {name} */," for f_id, name, _ in file_refs])
-    content += f"\t\t{id_group_src} /* StarkHUD */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n{src_children}\n\t\t\t\t{id_plist_ref} /* Info.plist */,\n\t\t\t);\n\t\t\tpath = StarkHUD;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
+    content += f"\t\t{id_group_src} /* Hefesto */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n{src_children}\n\t\t\t\t{id_assets_ref} /* Assets.xcassets */,\n\t\t\t\t{id_plist_ref} /* Info.plist */,\n\t\t\t);\n\t\t\tpath = Hefesto;\n\t\t\tsourceTree = \"<group>\";\n\t\t}};\n"
 
     content += """/* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-\t\t""" + f"""{id_target} /* StarkHUD */ = {{
+\t\t""" + f"""{id_target} /* Hefesto */ = {{
 \t\t\tisa = PBXNativeTarget;
-\t\t\tbuildConfigurationList = {id_config_list_target} /* Build configuration list for PBXNativeTarget "StarkHUD" */;
+\t\t\tbuildConfigurationList = {id_config_list_target} /* Build configuration list for PBXNativeTarget "Hefesto" */;
 \t\t\tbuildPhases = (
 \t\t\t\t{id_sources_phase} /* Sources */,
 \t\t\t\t{id_frameworks_phase} /* Frameworks */,
@@ -107,9 +108,9 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\t);
 \t\t\tdependencies = (
 \t\t\t);
-\t\t\tname = StarkHUD;
-\t\t\tproductName = StarkHUD;
-\t\t\tproductReference = {id_product_app} /* StarkHUD.app */;
+\t\t\tname = Hefesto;
+\t\t\tproductName = Hefesto;
+\t\t\tproductReference = {id_product_app} /* Hefesto.app */;
 \t\t\tproductType = "com.apple.product-type.application";
 \t\t}};
 /* End PBXNativeTarget section */
@@ -126,7 +127,7 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\t\t\t}};
 \t\t\t\t}};
 \t\t\t}};
-\t\t\tbuildConfigurationList = {id_config_list_proj} /* Build configuration list for PBXProject "StarkHUD" */;
+\t\t\tbuildConfigurationList = {id_config_list_proj} /* Build configuration list for PBXProject "Hefesto" */;
 \t\t\tcompatibilityVersion = "Xcode 14.0";
 \t\t\tdevelopmentRegion = es;
 \t\t\thasScannedForEncodings = 0;
@@ -139,7 +140,7 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\tprojectDirPath = "";
 \t\t\tprojectRoot = "";
 \t\t\ttargets = (
-\t\t\t\t{id_target} /* StarkHUD */,
+\t\t\t\t{id_target} /* Hefesto */,
 \t\t\t);
 \t\t}};
 /* End PBXProject section */
@@ -149,6 +150,7 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\tisa = PBXResourcesBuildPhase;
 \t\t\tbuildActionMask = 2147483647;
 \t\t\tfiles = (
+\t\t\t\t{id_assets_build} /* Assets.xcassets in Resources */,
 \t\t\t);
 \t\t\trunOnlyForDeploymentPostprocessing = 0;
 \t\t}};
@@ -223,14 +225,14 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\t\tDEVELOPMENT_TEAM = "";
 \t\t\t\tGENERATE_INFOPLIST_FILE = NO;
 \t\t\t\tINFOPLIST_FILE = Info.plist;
-\t\t\t\tINFOPLIST_KEY_CFBundleDisplayName = StarkHUD;
+\t\t\t\tINFOPLIST_KEY_CFBundleDisplayName = Hefesto;
 \t\t\t\tINFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 \t\t\t\tLD_RUNPATH_SEARCH_PATHS = (
 \t\t\t\t\t"$(inherited)",
 \t\t\t\t\t"@executable_path/Frameworks",
 \t\t\t\t);
 \t\t\t\tMARKETING_VERSION = 1.0;
-\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.odiseo.starkhud;
+\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.odiseo.hefesto;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -247,14 +249,14 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\t\tDEVELOPMENT_TEAM = "";
 \t\t\t\tGENERATE_INFOPLIST_FILE = NO;
 \t\t\t\tINFOPLIST_FILE = Info.plist;
-\t\t\t\tINFOPLIST_KEY_CFBundleDisplayName = StarkHUD;
+\t\t\t\tINFOPLIST_KEY_CFBundleDisplayName = Hefesto;
 \t\t\t\tINFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 \t\t\t\tLD_RUNPATH_SEARCH_PATHS = (
 \t\t\t\t\t"$(inherited)",
 \t\t\t\t\t"@executable_path/Frameworks",
 \t\t\t\t);
 \t\t\t\tMARKETING_VERSION = 1.0;
-\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.odiseo.starkhud;
+\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.odiseo.hefesto;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -265,7 +267,7 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-\t\t{id_config_list_proj} /* Build configuration list for PBXProject "StarkHUD" */ = {{
+\t\t{id_config_list_proj} /* Build configuration list for PBXProject "Hefesto" */ = {{
 \t\t\tisa = XCConfigurationList;
 \t\t\tbuildConfigurations = (
 \t\t\t\t{id_debug_proj} /* Debug */,
@@ -274,7 +276,7 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 \t\t\tdefaultConfigurationIsVisible = 0;
 \t\t\tdefaultConfigurationName = Release;
 \t\t}};
-\t\t{id_config_list_target} /* Build configuration list for PBXNativeTarget "StarkHUD" */ = {{
+\t\t{id_config_list_target} /* Build configuration list for PBXNativeTarget "Hefesto" */ = {{
 \t\t\tisa = XCConfigurationList;
 \t\t\tbuildConfigurations = (
 \t\t\t\t{id_debug_target} /* Debug */,
@@ -291,7 +293,7 @@ def create_xcodeproj(project_dir="/home/snow/StarkHUD"):
 """
     with open(pbx_path, "w", encoding="utf-8") as f:
         f.write(content)
-    print(f"Xcode project generado exitosamente en: {pbx_path}")
+    print(f"Hefesto.xcodeproj generado exitosamente en: {pbx_path}")
 
 if __name__ == "__main__":
     create_xcodeproj()

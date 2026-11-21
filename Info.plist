@@ -5,15 +5,15 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>es</string>
 	<key>CFBundleDisplayName</key>
-	<string>StarkHUD</string>
+	<string>Hefesto</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.odiseo.starkhud</string>
+	<string>com.odiseo.hefesto</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>StarkHUD</string>
+	<string>Hefesto</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>StarkHUD requiere acceso a la cámara para proyectar los despieces 3D holográficos en tu entorno mediante Realidad Aumentada (ARKit).</string>
+	<string>Hefesto requiere acceso a la cámara para proyectar los despieces 3D holográficos en tu entorno mediante Realidad Aumentada (ARKit).</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

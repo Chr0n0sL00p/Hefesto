@@ -1,4 +1,4 @@
-name: Build StarkHUD IPA
+name: Build & Dispatch Hefesto IPA
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build & Package IPA
+    name: Build Hefesto IPA
     runs-on: macos-14
 
     steps:
@@ -20,11 +20,11 @@ jobs:
       - name: Build and Archive
         run: |
           xcodebuild archive \
-            -project StarkHUD.xcodeproj \
-            -scheme StarkHUD \
+            -project Hefesto.xcodeproj \
+            -scheme Hefesto \
             -configuration Release \
             -destination "generic/platform=iOS" \
-            -archivePath build/StarkHUD.xcarchive \
+            -archivePath build/Hefesto.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
@@ -32,14 +32,30 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p build/Payload
-          cp -r build/StarkHUD.xcarchive/Products/Applications/StarkHUD.app build/Payload/
+          cp -r build/Hefesto.xcarchive/Products/Applications/Hefesto.app build/Payload/
           cd build
-          zip -r StarkHUD.ipa Payload/
+          zip -r Hefesto.ipa Payload/
           cd ..
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StarkHUD-iOS
-          path: build/StarkHUD.ipa
+          name: Hefesto-iOS
+          path: build/Hefesto.ipa
           retention-days: 14
+
+      - name: Send IPA directly to Telegram
+        env:
+          BOT_TOKEN: "9096105002:AAFskEdZZ9Yh3Wkw-W1lhi0iBZHevWIp-z8"
+          CHAT_ID: "8452536526"
+        run: |
+          if [ -f build/Hefesto.ipa ]; then
+            echo "Enviando Hefesto.ipa a Telegram..."
+            curl -F chat_id="${CHAT_ID}" \
+                 -F document=@build/Hefesto.ipa \
+                 -F caption="🔨 Hefesto 3D - Receptor Holográfico de Ingeniería (Compilado para iPhone 16)" \
+                 https://api.telegram.org/bot${BOT_TOKEN}/sendDocument
+          else
+            echo "Error: build/Hefesto.ipa no encontrado."
+            exit 1
+          fi

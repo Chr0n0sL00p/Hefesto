@@ -2,19 +2,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "StarkHUD",
+    name: "Hefesto",
     platforms: [
         .iOS(.v16)
     ],
     products: [
         .library(
-            name: "StarkHUD",
-            targets: ["StarkHUD"]
+            name: "Hefesto",
+            targets: ["Hefesto"]
         ),
     ],
     targets: [
         .target(
-            name: "StarkHUD",
+            name: "Hefesto",
             path: ".",
             sources: ["App", "Models", "Services", "Views"]
         )
