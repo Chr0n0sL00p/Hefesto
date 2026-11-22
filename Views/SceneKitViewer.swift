@@ -14,6 +14,7 @@ public struct SceneKitViewer: UIViewRepresentable {
     public let isExploded: Bool
     public let isXRayActive: Bool
     public let isSimulating: Bool
+    public let environment: ViewerEnvironment
     public let cameraResetTrigger: Int
 
     public init(
@@ -23,6 +24,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         isExploded: Bool,
         isXRayActive: Bool,
         isSimulating: Bool,
+        environment: ViewerEnvironment = .studioDark,
         cameraResetTrigger: Int
     ) {
         self.blueprint = blueprint
@@ -31,6 +33,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         self.isExploded = isExploded
         self.isXRayActive = isXRayActive
         self.isSimulating = isSimulating
+        self.environment = environment
         self.cameraResetTrigger = cameraResetTrigger
     }
 
@@ -40,7 +43,7 @@ public struct SceneKitViewer: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> SCNView {
         let scnView = SCNView()
-        scnView.backgroundColor = UIColor(red: 5/255, green: 8/255, blue: 14/255, alpha: 1.0)
+        scnView.backgroundColor = UIColor(red: 14/255, green: 18/255, blue: 27/255, alpha: 1.0)
         scnView.allowsCameraControl = true
         scnView.antialiasingMode = .multisampling4X
         scnView.autoenablesDefaultLighting = false
@@ -61,8 +64,9 @@ public struct SceneKitViewer: UIViewRepresentable {
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
-        ambientLight.light?.color = UIColor(white: 0.65, alpha: 1.0)
+        ambientLight.light?.color = UIColor(white: 0.70, alpha: 1.0)
         scene.rootNode.addChildNode(ambientLight)
+        context.coordinator.ambientLight = ambientLight.light
 
         let dirLight = SCNNode()
         dirLight.light = SCNLight()
@@ -72,6 +76,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         dirLight.position = SCNVector3(5, 10, 8)
         dirLight.eulerAngles = SCNVector3(-Float.pi/4, Float.pi/4, 0)
         scene.rootNode.addChildNode(dirLight)
+        context.coordinator.dirLight = dirLight.light
 
         let fillLight = SCNNode()
         fillLight.light = SCNLight()
@@ -80,6 +85,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         fillLight.light?.intensity = 900
         fillLight.position = SCNVector3(-6, -4, -4)
         scene.rootNode.addChildNode(fillLight)
+        context.coordinator.fillLight = fillLight.light
 
         let rimLight = SCNNode()
         rimLight.light = SCNLight()
@@ -88,13 +94,21 @@ public struct SceneKitViewer: UIViewRepresentable {
         rimLight.light?.intensity = 600
         rimLight.position = SCNVector3(0, -6, -8)
         scene.rootNode.addChildNode(rimLight)
+        context.coordinator.rimLight = rimLight.light
+
+        // Suelo con cuadrícula técnica CAD
+        let gridPlaneNode = Coordinator.createGridPlane()
+        gridPlaneNode.isHidden = (environment != .cadGrid)
+        scene.rootNode.addChildNode(gridPlaneNode)
+        context.coordinator.gridNode = gridPlaneNode
 
         // Gestor de toques para selección de partes y deselección
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
         scnView.addGestureRecognizer(tapGesture)
         context.coordinator.scnView = scnView
 
-        // Cargar modelo USDZ nativo
+        // Cargar modelo USDZ nativo y aplicar entorno inicial
+        context.coordinator.updateEnvironment(environment)
         context.coordinator.loadModel()
 
         return scnView
@@ -105,6 +119,11 @@ public struct SceneKitViewer: UIViewRepresentable {
         if context.coordinator.currentBlueprintId != blueprint.id {
             context.coordinator.currentBlueprintId = blueprint.id
             context.coordinator.loadModel()
+        }
+
+        if context.coordinator.currentEnvironment != environment {
+            context.coordinator.currentEnvironment = environment
+            context.coordinator.updateEnvironment(environment)
         }
 
         context.coordinator.updateExplosion(isExploded: isExploded)
@@ -126,10 +145,17 @@ public struct SceneKitViewer: UIViewRepresentable {
         var lastResetTrigger: Int = 0
         var currentBlueprintId: String = ""
         var isCurrentlySimulating: Bool = false
+        var currentEnvironment: ViewerEnvironment = .studioDark
+        weak var ambientLight: SCNLight?
+        weak var dirLight: SCNLight?
+        weak var fillLight: SCNLight?
+        weak var rimLight: SCNLight?
+        var gridNode: SCNNode?
 
         init(_ parent: SceneKitViewer) {
             self.parent = parent
             self.currentBlueprintId = parent.blueprint.id
+            self.currentEnvironment = parent.environment
         }
 
         func loadModel() {
@@ -397,6 +423,107 @@ public struct SceneKitViewer: UIViewRepresentable {
             }
 
             SCNTransaction.commit()
+        }
+
+        func updateEnvironment(_ env: ViewerEnvironment) {
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 0.4
+
+            switch env {
+            case .studioDark:
+                scnView?.backgroundColor = UIColor(red: 14/255, green: 18/255, blue: 27/255, alpha: 1.0)
+                gridNode?.isHidden = true
+                ambientLight?.color = UIColor(white: 0.70, alpha: 1.0)
+                dirLight?.intensity = 2200
+                dirLight?.color = UIColor.white
+                fillLight?.color = UIColor(red: 0.3, green: 0.75, blue: 1.0, alpha: 1.0)
+                fillLight?.intensity = 900
+                rimLight?.color = UIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: 1.0)
+                rimLight?.intensity = 600
+
+            case .cadGrid:
+                scnView?.backgroundColor = UIColor(red: 8/255, green: 13/255, blue: 22/255, alpha: 1.0)
+                gridNode?.isHidden = false
+                ambientLight?.color = UIColor(white: 0.60, alpha: 1.0)
+                dirLight?.intensity = 2400
+                dirLight?.color = UIColor(white: 0.95, alpha: 1.0)
+                fillLight?.color = UIColor(red: 0.0, green: 0.85, blue: 1.0, alpha: 1.0)
+                fillLight?.intensity = 1100
+                rimLight?.color = UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0)
+                rimLight?.intensity = 700
+
+            case .workshopWhite:
+                scnView?.backgroundColor = UIColor(red: 236/255, green: 240/255, blue: 246/255, alpha: 1.0)
+                gridNode?.isHidden = true
+                ambientLight?.color = UIColor(white: 0.90, alpha: 1.0)
+                dirLight?.intensity = 2600
+                dirLight?.color = UIColor.white
+                fillLight?.color = UIColor(red: 0.78, green: 0.84, blue: 0.92, alpha: 1.0)
+                fillLight?.intensity = 1200
+                rimLight?.color = UIColor(white: 0.75, alpha: 1.0)
+                rimLight?.intensity = 400
+            }
+
+            SCNTransaction.commit()
+        }
+
+        static func createGridPlane() -> SCNNode {
+            let size = CGSize(width: 512, height: 512)
+            let renderer = UIGraphicsImageRenderer(size: size)
+            let img = renderer.image { ctx in
+                let cg = ctx.cgContext
+                // Fondo azul técnico oscuro
+                cg.setFillColor(UIColor(red: 9/255, green: 15/255, blue: 26/255, alpha: 0.85).cgColor)
+                cg.fill(CGRect(origin: .zero, size: size))
+
+                // Líneas de cuadrícula secundaria cada 32px
+                cg.setLineWidth(1.0)
+                cg.setStrokeColor(UIColor(red: 0/255, green: 240/255, blue: 1.0, alpha: 0.20).cgColor)
+                for x in stride(from: 0, through: 512, by: 32) {
+                    cg.move(to: CGPoint(x: CGFloat(x), y: 0))
+                    cg.addLine(to: CGPoint(x: CGFloat(x), y: 512))
+                }
+                for y in stride(from: 0, through: 512, by: 32) {
+                    cg.move(to: CGPoint(x: 0, y: CGFloat(y)))
+                    cg.addLine(to: CGPoint(x: 512, y: CGFloat(y)))
+                }
+                cg.strokePath()
+
+                // Líneas maestras cada 128px
+                cg.setLineWidth(2.0)
+                cg.setStrokeColor(UIColor(red: 0/255, green: 240/255, blue: 1.0, alpha: 0.50).cgColor)
+                for x in stride(from: 0, through: 512, by: 128) {
+                    cg.move(to: CGPoint(x: CGFloat(x), y: 0))
+                    cg.addLine(to: CGPoint(x: CGFloat(x), y: 512))
+                }
+                for y in stride(from: 0, through: 512, by: 128) {
+                    cg.move(to: CGPoint(x: 0, y: CGFloat(y)))
+                    cg.addLine(to: CGPoint(x: 512, y: CGFloat(y)))
+                }
+                cg.strokePath()
+
+                // Círculo concéntrico técnico en el origen
+                cg.setLineWidth(2.0)
+                cg.setStrokeColor(UIColor(red: 0/255, green: 240/255, blue: 1.0, alpha: 0.65).cgColor)
+                cg.strokeEllipse(in: CGRect(x: 128, y: 128, width: 256, height: 256))
+            }
+
+            let planeGeom = SCNPlane(width: 25, height: 25)
+            planeGeom.cornerRadius = 0.5
+            let mat = SCNMaterial()
+            mat.diffuse.contents = img
+            mat.diffuse.wrapS = .repeat
+            mat.diffuse.wrapT = .repeat
+            mat.diffuse.contentsTransform = SCNMatrix4MakeScale(5, 5, 1)
+            mat.isDoubleSided = true
+            mat.lightingModel = .constant
+            planeGeom.materials = [mat]
+
+            let node = SCNNode(geometry: planeGeom)
+            node.name = "CADFloorGrid"
+            node.eulerAngles = SCNVector3(-Float.pi / 2.0, 0, 0)
+            node.position = SCNVector3(0, -2.3, 0)
+            return node
         }
 
         func resetCamera() {

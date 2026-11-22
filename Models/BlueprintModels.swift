@@ -201,3 +201,35 @@ public struct BlueprintPart: Identifiable, Codable, Hashable {
         return SCNVector3(posExploded[0], posExploded[1], posExploded[2])
     }
 }
+
+public enum ViewerEnvironment: String, CaseIterable, Identifiable {
+    case studioDark = "studio"
+    case cadGrid = "cad"
+    case workshopWhite = "workshop"
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .studioDark: return "Estudio Oscuro"
+        case .cadGrid: return "Cuadrícula CAD"
+        case .workshopWhite: return "Taller Blanco"
+        }
+    }
+
+    public var shortLabel: String {
+        switch self {
+        case .studioDark: return "Estudio"
+        case .cadGrid: return "CAD"
+        case .workshopWhite: return "Taller"
+        }
+    }
+
+    public var icon: String {
+        switch self {
+        case .studioDark: return "circle.lefthalf.filled"
+        case .cadGrid: return "squareshape.split.2x2"
+        case .workshopWhite: return "sun.max.fill"
+        }
+    }
+}

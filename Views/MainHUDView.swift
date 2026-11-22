@@ -16,6 +16,7 @@ public struct MainHUDView: View {
     @State private var isXRayActive: Bool = false
     @State private var isSimulating: Bool = false
     @State private var cameraResetTrigger: Int = 0
+    @State private var selectedEnvironment: ViewerEnvironment = .studioDark
 
     @State private var isFunctionsExpanded: Bool = false
     @State private var isModelPickerPresented: Bool = false
@@ -46,6 +47,7 @@ public struct MainHUDView: View {
                     isExploded: isExploded,
                     isXRayActive: isXRayActive,
                     isSimulating: isSimulating,
+                    environment: selectedEnvironment,
                     cameraResetTrigger: cameraResetTrigger
                 )
                 .id(blueprint.id)
@@ -183,6 +185,40 @@ public struct MainHUDView: View {
                 }
 
                 Spacer()
+
+                // Botón Selector Rápido de Entornos (Estudio Oscuro, Cuadrícula CAD, Blanco Taller)
+                Button(action: {
+                    let haptic = UIImpactFeedbackGenerator(style: .medium)
+                    haptic.impactOccurred()
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                        switch selectedEnvironment {
+                        case .studioDark:
+                            selectedEnvironment = .cadGrid
+                        case .cadGrid:
+                            selectedEnvironment = .workshopWhite
+                        case .workshopWhite:
+                            selectedEnvironment = .studioDark
+                        }
+                    }
+                }) {
+                    HStack(spacing: 5) {
+                        Image(systemName: selectedEnvironment.icon)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(selectedEnvironment == .workshopWhite ? Color(red: 249/255, green: 115/255, blue: 22/255) : Color(red: 0, green: 240/255, blue: 1.0))
+
+                        Text(selectedEnvironment.shortLabel)
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.85))
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule().stroke(Color.white.opacity(0.18), lineWidth: 0.8)
+                    )
+                    .shadow(color: Color.black.opacity(0.3), radius: 4)
+                }
 
                 // Si hay pieza seleccionada, botón rápido para cerrar
                 if selectedPart != nil {
@@ -479,6 +515,23 @@ public struct MainHUDView: View {
                         activeColor: Color.white
                     ) {
                         cameraResetTrigger += 1
+                    }
+
+                    // 6. Selector de Entorno de Fondo
+                    dockButton(
+                        icon: selectedEnvironment.icon,
+                        label: selectedEnvironment.shortLabel,
+                        isActive: true,
+                        activeColor: selectedEnvironment == .workshopWhite ? Color.orange : Color(red: 0, green: 240/255, blue: 1.0)
+                    ) {
+                        switch selectedEnvironment {
+                        case .studioDark:
+                            selectedEnvironment = .cadGrid
+                        case .cadGrid:
+                            selectedEnvironment = .workshopWhite
+                        case .workshopWhite:
+                            selectedEnvironment = .studioDark
+                        }
                     }
                 }
                 .padding(.vertical, 12)
