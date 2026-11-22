@@ -611,7 +611,7 @@ public struct MainHUDView: View {
                     // Botón de sincronización con Odiseo
                     Button(action: {
                         Task {
-                            await apiService.fetchBlueprints()
+                            await apiService.fetchBlueprints(clearCache: true)
                         }
                     }) {
                         HStack(spacing: 8) {

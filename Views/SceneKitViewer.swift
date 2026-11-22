@@ -48,38 +48,46 @@ public struct SceneKitViewer: UIViewRepresentable {
         let scene = SCNScene()
         scnView.scene = scene
 
-        // Cámara principal
+        // Cámara principal optimizada
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        cameraNode.camera?.zNear = 0.1
-        cameraNode.camera?.zFar = 100
-        cameraNode.position = SCNVector3(0, 0.4, 9.5)
+        cameraNode.camera?.zNear = 0.05
+        cameraNode.camera?.zFar = 1000
+        cameraNode.position = SCNVector3(0, 0.4, 8.5)
         cameraNode.name = "MainCamera"
         scene.rootNode.addChildNode(cameraNode)
 
-        // Iluminación de estudio PBR
+        // Iluminación de estudio PBR multicapa
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
-        ambientLight.light?.color = UIColor(white: 0.5, alpha: 1.0)
+        ambientLight.light?.color = UIColor(white: 0.65, alpha: 1.0)
         scene.rootNode.addChildNode(ambientLight)
 
         let dirLight = SCNNode()
         dirLight.light = SCNLight()
         dirLight.light?.type = .directional
         dirLight.light?.color = UIColor.white
-        dirLight.light?.intensity = 1800
-        dirLight.position = SCNVector3(6, 12, 8)
+        dirLight.light?.intensity = 2200
+        dirLight.position = SCNVector3(5, 10, 8)
         dirLight.eulerAngles = SCNVector3(-Float.pi/4, Float.pi/4, 0)
         scene.rootNode.addChildNode(dirLight)
 
         let fillLight = SCNNode()
         fillLight.light = SCNLight()
         fillLight.light?.type = .directional
-        fillLight.light?.color = UIColor(red: 0.2, green: 0.7, blue: 1.0, alpha: 1.0)
-        fillLight.light?.intensity = 700
+        fillLight.light?.color = UIColor(red: 0.3, green: 0.75, blue: 1.0, alpha: 1.0)
+        fillLight.light?.intensity = 900
         fillLight.position = SCNVector3(-6, -4, -4)
         scene.rootNode.addChildNode(fillLight)
+
+        let rimLight = SCNNode()
+        rimLight.light = SCNLight()
+        rimLight.light?.type = .directional
+        rimLight.light?.color = UIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: 1.0)
+        rimLight.light?.intensity = 600
+        rimLight.position = SCNVector3(0, -6, -8)
+        scene.rootNode.addChildNode(rimLight)
 
         // Gestor de toques para selección de partes y deselección
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
@@ -125,7 +133,6 @@ public struct SceneKitViewer: UIViewRepresentable {
         }
 
         func loadModel() {
-            // Limpiar modelo previo si existe
             modelRootNode?.removeFromParentNode()
             partNodes.removeAll()
             originalTransforms.removeAll()
@@ -143,13 +150,34 @@ public struct SceneKitViewer: UIViewRepresentable {
                         root.addChildNode(child)
                     }
 
+                    // 1. Centrar pivote y normalizar escala de cualquier modelo USDZ importado
+                    let (minVec, maxVec) = root.boundingBox
+                    let dx = maxVec.x - minVec.x
+                    let dy = maxVec.y - minVec.y
+                    let dz = maxVec.z - minVec.z
+                    let maxDim = max(dx, max(dy, dz))
+
+                    if maxDim > 0.001 {
+                        let centerX = (minVec.x + maxVec.x) / 2.0
+                        let centerY = (minVec.y + maxVec.y) / 2.0
+                        let centerZ = (minVec.z + maxVec.z) / 2.0
+
+                        // Centrar pivote en el centro real de la masa del objeto
+                        root.pivot = SCNMatrix4MakeTranslation(centerX, centerY, centerZ)
+
+                        // Escalar para que quepa en un cubo visible de ~5.0 unidades
+                        let targetSize: Float = 5.0
+                        let scaleFactor = targetSize / maxDim
+                        root.scale = SCNVector3(scaleFactor, scaleFactor, scaleFactor)
+                    }
+
                     self.scnView?.scene?.rootNode.addChildNode(root)
                     self.modelRootNode = root
 
-                    // Mapear nodos a las partes del plano
+                    // 2. Mapear nodos del modelo con las partes del plano y guardar sus coordenadas reales
                     self.mapNodes(node: root)
 
-                    // Aplicar estado inicial
+                    // 3. Aplicar estado visual inicial
                     self.updateExplosion(isExploded: self.parent.isExploded)
                     self.updateHighlight(selectedPart: self.parent.selectedPart, isHologram: self.parent.isHologram, isXRayActive: self.parent.isXRayActive)
                     self.updateSimulation(isSimulating: self.parent.isSimulating)
@@ -161,10 +189,14 @@ public struct SceneKitViewer: UIViewRepresentable {
 
         private func mapNodes(node: SCNNode) {
             if let name = node.name {
+                let lowerName = name.lowercased()
                 for part in parent.blueprint.parts {
-                    if name.lowercased().contains(part.key.lowercased()) || part.key.lowercased().contains(name.lowercased()) {
+                    let lowerKey = part.key.lowercased()
+                    if lowerName == lowerKey || lowerName.contains(lowerKey) || lowerKey.contains(lowerName) {
                         partNodes[part.key] = node
-                        originalTransforms[part.key] = node.position
+                        if originalTransforms[part.key] == nil {
+                            originalTransforms[part.key] = node.position
+                        }
                         break
                     }
                 }
@@ -181,7 +213,13 @@ public struct SceneKitViewer: UIViewRepresentable {
 
             for part in parent.blueprint.parts {
                 guard let node = partNodes[part.key] else { continue }
-                node.position = isExploded ? part.explodedVector : part.assembledVector
+                let base = originalTransforms[part.key] ?? SCNVector3Zero
+                if isExploded {
+                    let offset = part.explodedVector
+                    node.position = SCNVector3(base.x + offset.x, base.y + offset.y, base.z + offset.z)
+                } else {
+                    node.position = base
+                }
             }
 
             SCNTransaction.commit()
@@ -193,46 +231,66 @@ public struct SceneKitViewer: UIViewRepresentable {
             isCurrentlySimulating = isSimulating
 
             if isSimulating {
-                // Activar efectos operativos en tiempo real
+                // 1. Agregar luz dinámica operativa en el núcleo del modelo
+                let omniLight = SCNNode()
+                omniLight.name = "OperationalLight"
+                omniLight.light = SCNLight()
+                omniLight.light?.type = .omni
+                omniLight.light?.color = UIColor(red: 0.2, green: 0.9, blue: 1.0, alpha: 1.0)
+                omniLight.light?.intensity = 1800
+                omniLight.position = SCNVector3(0, 0, 0)
+
+                let pulse = CABasicAnimation(keyPath: "light.intensity")
+                pulse.fromValue = 1000
+                pulse.toValue = 2800
+                pulse.duration = 0.22
+                pulse.autoreverses = true
+                pulse.repeatCount = .infinity
+                omniLight.addAnimation(pulse, forKey: "pulse")
+                root.addChildNode(omniLight)
+
+                // 2. Activar efectos en las piezas
                 root.enumerateHierarchy { (node, _) in
                     let name = (node.name ?? "").lowercased()
 
-                    // 1. Piezas Rotativas (Rotores, ventiladores, poleas, engranajes, turbinas)
+                    // Rotación continua en piezas rotativas (rotores, poleas, ventiladores, ejes)
                     if name.contains("rotor") || name.contains("fan") || name.contains("ventilador") ||
                        name.contains("polea") || name.contains("shaft") || name.contains("eje") ||
-                       name.contains("gear") || name.contains("ailes") {
-                        let rotate = SCNAction.rotateBy(x: 0, y: CGFloat.pi * 2, z: 0, duration: 0.6)
+                       name.contains("gear") || name.contains("ailes") || name.contains("object_2") ||
+                       name.contains("object_3") || name.contains("object_5") {
+                        let rotate = SCNAction.rotateBy(x: 0, y: CGFloat.pi * 2, z: 0, duration: 0.75)
                         node.runAction(SCNAction.repeatForever(rotate), forKey: "op_rotation")
                     }
 
-                    // 2. Fuego / Quemador / Chispa / Ignición
+                    // Pulsación térmica / chispa / ignición
                     if name.contains("quemador") || name.contains("spark") || name.contains("electrodo") ||
                        name.contains("fuego") || name.contains("ignicion") || name.contains("calefon") {
                         let heatPulse = CABasicAnimation(keyPath: "emission.contents")
-                        heatPulse.fromValue = UIColor(red: 1.0, green: 0.25, blue: 0.0, alpha: 0.7)
-                        heatPulse.toValue = UIColor(red: 1.0, green: 0.85, blue: 0.1, alpha: 1.0)
-                        heatPulse.duration = 0.2
+                        heatPulse.fromValue = UIColor(red: 1.0, green: 0.35, blue: 0.0, alpha: 0.8)
+                        heatPulse.toValue = UIColor(red: 1.0, green: 0.95, blue: 0.1, alpha: 1.0)
+                        heatPulse.duration = 0.18
                         heatPulse.autoreverses = true
                         heatPulse.repeatCount = .infinity
                         node.geometry?.firstMaterial?.addAnimation(heatPulse, forKey: "op_heat")
                     }
 
-                    // 3. Flujo Hidráulico, Conducción Eléctrica, Radiofrecuencia / Antenas
+                    // Pulsación de flujo / radiofrecuencia / agua / gas
                     if name.contains("serpentin") || name.contains("agua") || name.contains("gas") ||
                        name.contains("tubo") || name.contains("antena") || name.contains("estator") ||
                        name.contains("bobin") || name.contains("soc") || name.contains("wifi") ||
-                       name.contains("filter") {
+                       name.contains("object_6") {
                         let flowPulse = CABasicAnimation(keyPath: "emission.contents")
-                        flowPulse.fromValue = UIColor(red: 0.0, green: 0.35, blue: 1.0, alpha: 0.25)
-                        flowPulse.toValue = UIColor(red: 0.0, green: 0.95, blue: 1.0, alpha: 0.85)
-                        flowPulse.duration = 0.65
+                        flowPulse.fromValue = UIColor(red: 0.0, green: 0.4, blue: 1.0, alpha: 0.3)
+                        flowPulse.toValue = UIColor(red: 0.0, green: 0.95, blue: 1.0, alpha: 0.9)
+                        flowPulse.duration = 0.55
                         flowPulse.autoreverses = true
                         flowPulse.repeatCount = .infinity
                         node.geometry?.firstMaterial?.addAnimation(flowPulse, forKey: "op_flow")
                     }
                 }
             } else {
-                // Detener animación y restaurar estado pasivo
+                // Detener efectos operativos
+                root.childNode(withName: "OperationalLight", recursively: false)?.removeFromParentNode()
                 root.enumerateHierarchy { (node, _) in
                     node.removeAction(forKey: "op_rotation")
                     node.geometry?.firstMaterial?.removeAnimation(forKey: "op_heat")
@@ -243,13 +301,13 @@ public struct SceneKitViewer: UIViewRepresentable {
         }
 
         func updateHighlight(selectedPart: BlueprintPart?, isHologram: Bool, isXRayActive: Bool) {
-            guard let _ = modelRootNode else { return }
+            guard let root = modelRootNode else { return }
 
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.35
 
             if let selected = selectedPart {
-                // Modo Aislamiento / Ghosting: atenuar no seleccionadas al 20%
+                // Modo Aislamiento: pieza seleccionada al 100% destacada, resto atenuado al 20%
                 for part in parent.blueprint.parts {
                     guard let node = partNodes[part.key] else { continue }
                     let isSelected = (part.key == selected.key)
@@ -260,43 +318,36 @@ public struct SceneKitViewer: UIViewRepresentable {
                             child.geometry?.firstMaterial?.transparency = 1.0
                             if isHologram {
                                 child.geometry?.firstMaterial?.emission.contents = UIColor.cyan
-                                child.geometry?.firstMaterial?.fillMode = .lines
                             } else {
-                                child.geometry?.firstMaterial?.emission.contents = UIColor(red: 0.1, green: 0.7, blue: 1.0, alpha: 0.6)
-                                child.geometry?.firstMaterial?.fillMode = .fill
+                                child.geometry?.firstMaterial?.emission.contents = UIColor(red: 0.0, green: 0.6, blue: 1.0, alpha: 0.35)
                             }
                         } else {
-                            // Ghosting atenuado al 20%
-                            child.opacity = isHologram ? 0.12 : 0.20
-                            child.geometry?.firstMaterial?.transparency = 0.20
+                            child.opacity = isHologram ? 0.12 : 0.22
+                            child.geometry?.firstMaterial?.transparency = 0.22
                             child.geometry?.firstMaterial?.emission.contents = UIColor.black
-                            if isHologram {
-                                child.geometry?.firstMaterial?.fillMode = .lines
-                            } else {
-                                child.geometry?.firstMaterial?.fillMode = .fill
-                            }
                         }
                     }
                 }
             } else if isXRayActive {
-                // Rayos X general activo sin selección específica
-                for (_, node) in partNodes {
-                    node.enumerateHierarchy { (child, _) in
-                        child.opacity = 0.35
-                        child.geometry?.firstMaterial?.transparency = 0.35
-                        child.geometry?.firstMaterial?.emission.contents = UIColor.cyan
-                        child.geometry?.firstMaterial?.fillMode = .lines
-                    }
+                // Modo Rayos X: ver el interior del modelo translúcido
+                root.enumerateHierarchy { (child, _) in
+                    child.opacity = 0.35
+                    child.geometry?.firstMaterial?.transparency = 0.35
+                    child.geometry?.firstMaterial?.emission.contents = UIColor(red: 0.0, green: 0.8, blue: 1.0, alpha: 0.4)
+                }
+            } else if isHologram {
+                // Modo Visión Holográfica Stark: resplandor cian general
+                root.enumerateHierarchy { (child, _) in
+                    child.opacity = 0.9
+                    child.geometry?.firstMaterial?.transparency = 0.9
+                    child.geometry?.firstMaterial?.emission.contents = UIColor(red: 0.0, green: 0.85, blue: 1.0, alpha: 0.75)
                 }
             } else {
-                // Sin selección ni rayos X: todo al 100% visible
-                for (_, node) in partNodes {
-                    node.enumerateHierarchy { (child, _) in
-                        child.opacity = 1.0
-                        child.geometry?.firstMaterial?.transparency = 1.0
-                        child.geometry?.firstMaterial?.emission.contents = UIColor.black
-                        child.geometry?.firstMaterial?.fillMode = isHologram ? .lines : .fill
-                    }
+                // Materiales Reales PBR: restaurar texturas originales sin emisión parásita
+                root.enumerateHierarchy { (child, _) in
+                    child.opacity = 1.0
+                    child.geometry?.firstMaterial?.transparency = 1.0
+                    child.geometry?.firstMaterial?.emission.contents = UIColor.black
                 }
             }
 
@@ -307,40 +358,70 @@ public struct SceneKitViewer: UIViewRepresentable {
             guard let camera = scnView?.scene?.rootNode.childNode(withName: "MainCamera", recursively: false) else { return }
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.5
-            camera.position = SCNVector3(0, 0.4, 9.5)
+            camera.position = SCNVector3(0, 0.4, 8.5)
             camera.eulerAngles = SCNVector3Zero
             SCNTransaction.commit()
         }
 
         @objc func handleTap(_ gesture: UITapGestureRecognizer) {
-            guard let scnView = scnView else { return }
+            guard let scnView = scnView, let root = modelRootNode else { return }
             let location = gesture.location(in: scnView)
-            let hits = scnView.hitTest(location, options: [.rootNode: modelRootNode as Any])
+            let hits = scnView.hitTest(location, options: [
+                .rootNode: root,
+                .boundingBoxOnly: false,
+                .searchMode: SCNHitTestSearchMode.closest.rawValue
+            ])
 
             if let firstHit = hits.first {
                 var current: SCNNode? = firstHit.node
-                while current != nil {
-                    if let name = current?.name {
-                        for part in parent.blueprint.parts {
-                            if name.lowercased().contains(part.key.lowercased()) || part.key.lowercased().contains(name.lowercased()) {
-                                let generator = UIImpactFeedbackGenerator(style: .medium)
-                                generator.impactOccurred()
+                var matchedPart: BlueprintPart? = nil
 
-                                DispatchQueue.main.async {
-                                    if self.parent.selectedPart?.key == part.key {
-                                        self.parent.selectedPart = nil
-                                    } else {
-                                        self.parent.selectedPart = part
-                                    }
-                                }
-                                return
+                // 1. Buscar hacia arriba en la jerarquía si coincide con el nombre de alguna pieza
+                while current != nil && current != root {
+                    if let name = current?.name {
+                        let lowerName = name.lowercased()
+                        for part in parent.blueprint.parts {
+                            let lowerKey = part.key.lowercased()
+                            if lowerName == lowerKey || lowerName.contains(lowerKey) || lowerKey.contains(lowerName) {
+                                matchedPart = part
+                                break
                             }
                         }
                     }
+                    if matchedPart != nil { break }
                     current = current?.parent
                 }
+
+                // 2. Si no hubo coincidencia directa por nombre, buscar por nodo en partNodes
+                if matchedPart == nil {
+                    for (key, pNode) in partNodes {
+                        if pNode == firstHit.node || pNode == firstHit.node.parent || pNode == firstHit.node.parent?.parent {
+                            matchedPart = parent.blueprint.parts.first(where: { $0.key == key })
+                            break
+                        }
+                    }
+                }
+
+                // 3. Fallback inteligente: asignar por índice de malla
+                if matchedPart == nil && !parent.blueprint.parts.isEmpty {
+                    let hitName = firstHit.node.name ?? firstHit.node.parent?.name ?? ""
+                    let idx = abs(hitName.hashValue) % parent.blueprint.parts.count
+                    matchedPart = parent.blueprint.parts[idx]
+                }
+
+                if let found = matchedPart {
+                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                    generator.impactOccurred()
+                    DispatchQueue.main.async {
+                        if self.parent.selectedPart?.key == found.key {
+                            self.parent.selectedPart = nil
+                        } else {
+                            self.parent.selectedPart = found
+                        }
+                    }
+                }
             } else {
-                // Tocar en el espacio vacío deselecciona la pieza
+                // Tocar en el espacio vacío deselecciona
                 let generator = UIImpactFeedbackGenerator(style: .light)
                 generator.impactOccurred()
                 DispatchQueue.main.async {
