@@ -99,6 +99,27 @@ public struct Blueprint: Identifiable, Codable, Hashable {
         self.phases = try container.decodeIfPresent([String].self, forKey: .phases) ?? []
         self.parts = try container.decodeIfPresent([BlueprintPart].self, forKey: .parts) ?? []
     }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encode(subtitle, forKey: .subtitle)
+        try container.encode(norm, forKey: .norm)
+        try container.encode(usdzUrl, forKey: .usdzUrl)
+        try container.encode(htmlUrl, forKey: .htmlUrl)
+        try container.encode(flowBtnLabel, forKey: .flowBtnLabel)
+        try container.encode(flowStateOn, forKey: .flowStateOn)
+        try container.encode(flowStateOff, forKey: .flowStateOff)
+        try container.encode(stat1Label, forKey: .stat1Label)
+        try container.encode(stat1ValOn, forKey: .stat1ValOn)
+        try container.encode(stat1ValOff, forKey: .stat1ValOff)
+        try container.encode(stat2Label, forKey: .stat2Label)
+        try container.encode(stat2ValOn, forKey: .stat2ValOn)
+        try container.encode(stat2ValOff, forKey: .stat2ValOff)
+        try container.encode(phases, forKey: .phases)
+        try container.encode(parts, forKey: .parts)
+    }
 }
 
 public struct BlueprintPart: Identifiable, Codable, Hashable {
@@ -155,6 +176,19 @@ public struct BlueprintPart: Identifiable, Codable, Hashable {
         self.failure = try container.decodeIfPresent(String.self, forKey: .failure) ?? "Desgaste normal por fatiga mecánica o térmica."
         self.posAssembled = try container.decodeIfPresent([Float].self, forKey: .posAssembled) ?? [0.0, 0.0, 0.0]
         self.posExploded = try container.decodeIfPresent([Float].self, forKey: .posExploded) ?? [0.0, 1.0, 0.0]
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(key, forKey: .key)
+        try container.encode(name, forKey: .name)
+        try container.encode(subsystem, forKey: .subsystem)
+        try container.encode(material, forKey: .material)
+        try container.encode(function, forKey: .function)
+        try container.encode(failure, forKey: .failure)
+        try container.encode(posAssembled, forKey: .posAssembled)
+        try container.encode(posExploded, forKey: .posExploded)
     }
 
     public var assembledVector: SCNVector3 {
