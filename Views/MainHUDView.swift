@@ -14,6 +14,7 @@ public struct MainHUDView: View {
     @State private var isHologram: Bool = false
     @State private var isExploded: Bool = false
     @State private var isXRayActive: Bool = false
+    @State private var isSimulating: Bool = false
     @State private var cameraResetTrigger: Int = 0
 
     @State private var isFunctionsExpanded: Bool = false
@@ -44,6 +45,7 @@ public struct MainHUDView: View {
                     isHologram: isHologram,
                     isExploded: isExploded,
                     isXRayActive: isXRayActive,
+                    isSimulating: isSimulating,
                     cameraResetTrigger: cameraResetTrigger
                 )
                 .id(blueprint.id)
@@ -101,9 +103,9 @@ public struct MainHUDView: View {
     @ViewBuilder
     private var topHUDBar: some View {
         VStack(spacing: 10) {
-            // Fila de estado discreto
-            HStack {
-                // Indicador discreto de conexión
+            // Fila de estado discreto y telemetría
+            HStack(spacing: 8) {
+                // Indicador discreto de conexión y modelo activo
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         showConnectionToast.toggle()
@@ -128,7 +130,7 @@ public struct MainHUDView: View {
                         }
                     }
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
+                    .padding(.vertical, 6)
                     .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.8))
                     .clipShape(Capsule())
                     .overlay(
@@ -136,9 +138,53 @@ public struct MainHUDView: View {
                     )
                 }
 
+                // Píldora de Telemetría y Encendido / Simular Flujo
+                if let bp = activeBlueprint {
+                    Button(action: {
+                        let haptic = UIImpactFeedbackGenerator(style: .medium)
+                        haptic.impactOccurred()
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                            isSimulating.toggle()
+                        }
+                    }) {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(isSimulating ? Color(red: 16/255, green: 185/255, blue: 129/255) : Color.white.opacity(0.3))
+                                .frame(width: 7, height: 7)
+                                .shadow(color: isSimulating ? Color(red: 16/255, green: 185/255, blue: 129/255).opacity(0.9) : Color.clear, radius: 4)
+
+                            Image(systemName: isSimulating ? "bolt.fill" : "power")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(isSimulating ? Color(red: 16/255, green: 185/255, blue: 129/255) : Color.white.opacity(0.6))
+
+                            Text(isSimulating ? bp.flowStateOn : bp.flowStateOff)
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(isSimulating ? Color(red: 16/255, green: 185/255, blue: 129/255) : Color.white.opacity(0.65))
+                                .lineLimit(1)
+
+                            // Métrica de ingeniería activa
+                            if isSimulating {
+                                Text("·")
+                                    .foregroundColor(Color.white.opacity(0.3))
+                                Text("\(bp.stat1Label): \(bp.stat1ValOn)")
+                                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(Color(red: 0, green: 240/255, blue: 1.0))
+                                    .lineLimit(1)
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(isSimulating ? Color(red: 16/255, green: 185/255, blue: 129/255).opacity(0.15) : Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.8))
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule().stroke(isSimulating ? Color(red: 16/255, green: 185/255, blue: 129/255).opacity(0.6) : Color.white.opacity(0.12), lineWidth: 0.8)
+                        )
+                    }
+                }
+
                 Spacer()
 
-                // Si hay pieza seleccionada, indicador rápido
+                // Si hay pieza seleccionada, botón rápido para cerrar
                 if selectedPart != nil {
                     Button(action: {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
@@ -180,172 +226,156 @@ public struct MainHUDView: View {
 
                 Spacer()
 
-                // Indicador de deslizamiento
-                HStack(spacing: 3) {
-                    ForEach(0..<4) { idx in
+                // Selector de pestañas horizontal tipo píldoras
+                HStack(spacing: 4) {
+                    ForEach(0..<4) { tabIndex in
                         Circle()
-                            .fill(infoCardTab == idx ? Color(red: 0, green: 240/255, blue: 1.0) : Color.white.opacity(0.25))
-                            .frame(width: 5, height: 5)
+                            .fill(infoCardTab == tabIndex ? Color(red: 0, green: 240/255, blue: 1.0) : Color.white.opacity(0.25))
+                            .frame(width: 6, height: 6)
                     }
                 }
             }
 
-            // Paginador horizontal deslizable
+            // Contenedor deslizable con TabView paged
             TabView(selection: $infoCardTab) {
-                // Pag 1: Función & Qué es
-                infoCardPage(
-                    tag: 0,
-                    icon: "wrench.and.screwdriver.fill",
-                    iconColor: Color(red: 0, green: 240/255, blue: 1.0),
-                    title: "FUNCIÓN MECÁNICA & OPERACIÓN",
-                    text: part.function
-                )
+                // Página 1: Función Principal & Subsistema
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: "gearshape.2.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(red: 0, green: 240/255, blue: 1.0))
+                        Text("FUNCIÓN OPERATIVA & SUBSISTEMA")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundColor(Color(white: 0.6))
+                    }
+                    Text(part.function)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(white: 0.95))
+                        .lineLimit(3)
 
-                // Pag 2: Material & Fabricación
-                infoCardPage(
-                    tag: 1,
-                    icon: "cube.fill",
-                    iconColor: Color(red: 249/255, green: 115/255, blue: 22/255),
-                    title: "MATERIAL & FABRICACIÓN INDUSTRIAL",
-                    text: part.material
-                )
+                    Spacer(minLength: 0)
+                }
+                .tag(0)
 
-                // Pag 3: Diagnóstico & Fallas Comunes
-                infoCardPage(
-                    tag: 2,
-                    icon: "exclamationmark.triangle.fill",
-                    iconColor: Color(red: 239/255, green: 68/255, blue: 68/255),
-                    title: "DIAGNÓSTICO & FALLA FRECUENTE",
-                    text: part.failure
-                )
+                // Página 2: Material & Fabricación
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: "cube.transparent")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(red: 249/255, green: 115/255, blue: 22/255))
+                        Text("MATERIAL & ESPECIFICACIÓN")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundColor(Color(white: 0.6))
+                    }
+                    Text(part.material)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(white: 0.95))
+                        .lineLimit(3)
 
-                // Pag 4: Ciclo Operativo
-                infoCardPhasesPage(tag: 3, blueprint: blueprint)
+                    Spacer(minLength: 0)
+                }
+                .tag(1)
+
+                // Página 3: Diagnóstico & Fallas Frecuentes
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(red: 239/255, green: 68/255, blue: 68/255))
+                        Text("DIAGNÓSTICO & FALLA FRECUENTE")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundColor(Color(red: 239/255, green: 68/255, blue: 68/255))
+                    }
+                    Text(part.failure)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(white: 0.95))
+                        .lineLimit(3)
+
+                    Spacer(minLength: 0)
+                }
+                .tag(2)
+
+                // Página 4: Fases de Operación Industrial
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(red: 34/255, green: 197/255, blue: 94/255))
+                        Text("CICLO OPERATIVO (\(blueprint.norm))")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundColor(Color(white: 0.6))
+                    }
+                    if let firstPhase = blueprint.phases.first {
+                        Text(firstPhase)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(Color(white: 0.95))
+                            .lineLimit(3)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+                .tag(3)
             }
-            .frame(height: 105)
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(height: 72)
         }
         .padding(12)
         .background(
-            Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.92)
+            Color(red: 11/255, green: 17/255, blue: 28/255)
+                .opacity(0.92)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(red: 0, green: 240/255, blue: 1.0).opacity(0.35), lineWidth: 1)
+                .stroke(Color(red: 0, green: 240/255, blue: 1.0).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.6), radius: 14, x: 0, y: 6)
+        .shadow(color: Color.black.opacity(0.5), radius: 10, y: 4)
     }
 
-    private func infoCardPage(tag: Int, icon: String, iconColor: Color, title: String, text: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.system(size: 10))
-                    .foregroundColor(iconColor)
-                Text(title)
-                    .font(.system(size: 9, weight: .black))
-                    .foregroundColor(iconColor)
-                    .tracking(0.5)
-                Spacer()
-                Text("Desliza →")
-                    .font(.system(size: 9))
-                    .foregroundColor(Color.white.opacity(0.4))
-            }
-
-            ScrollView(.vertical, showsIndicators: false) {
-                Text(text)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color.white.opacity(0.92))
-                    .lineSpacing(2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-        .tag(tag)
-    }
-
-    private func infoCardPhasesPage(tag: Int, blueprint: Blueprint) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 5) {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 10))
-                    .foregroundColor(Color(red: 168/255, green: 85/255, blue: 247/255))
-                Text("CICLO OPERATIVO EN 4 FASES")
-                    .font(.system(size: 9, weight: .black))
-                    .foregroundColor(Color(red: 168/255, green: 85/255, blue: 247/255))
-                Spacer()
-            }
-
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(Array(blueprint.phases.enumerated()), id: \.offset) { index, phase in
-                        HStack(alignment: .top, spacing: 6) {
-                            Text("\(index + 1)")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(width: 14, height: 14)
-                                .background(Color(red: 168/255, green: 85/255, blue: 247/255))
-                                .clipShape(Circle())
-
-                            Text(phase)
-                                .font(.system(size: 11))
-                                .foregroundColor(Color.white.opacity(0.9))
-                        }
-                    }
-                }
-            }
-        }
-        .tag(tag)
-    }
-
-    // MARK: - Barra Inferior & Botón Modelos 3D
+    // MARK: - Barra Inferior con Botón "Modelos 3D"
     private var bottomHUDBar: some View {
         HStack(alignment: .bottom) {
-            // Botón "Modelos 3D" (inferior izquierdo como en el mockup)
+            // Botón "Modelos 3D" con badge discreto
             Button(action: {
                 let haptic = UIImpactFeedbackGenerator(style: .medium)
                 haptic.impactOccurred()
                 isModelPickerPresented = true
             }) {
                 HStack(spacing: 8) {
-                    ZStack {
-                        Circle()
-                            .fill(LinearGradient(
-                                colors: [Color(red: 245/255, green: 158/255, blue: 11/255), Color(red: 217/255, green: 119/255, blue: 6/255)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ))
-                            .frame(width: 36, height: 36)
+                    Image(systemName: "square.stack.3d.up.fill")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(Color(red: 0, green: 240/255, blue: 1.0))
 
-                        Image(systemName: "cube.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Text("Modelos 3D")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.white)
 
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("Modelos 3D")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.white)
-                        Text(activeBlueprint?.title ?? "Alternar")
-                            .font(.system(size: 9))
-                            .foregroundColor(Color.white.opacity(0.6))
-                            .lineLimit(1)
-                    }
-
-                    Image(systemName: "chevron.up.circle.fill")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.white.opacity(0.5))
-                        .padding(.trailing, 4)
+                    Text("\(apiService.blueprints.count)")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(Color(red: 0, green: 240/255, blue: 1.0))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(red: 0, green: 240/255, blue: 1.0).opacity(0.15))
+                        .clipShape(Capsule())
                 }
-                .padding(.leading, 4)
-                .padding(.trailing, 10)
-                .padding(.vertical, 4)
-                .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.85))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 15/255, green: 22/255, blue: 36/255).opacity(0.92),
+                            Color(red: 9/255, green: 14/255, blue: 24/255).opacity(0.92)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .clipShape(Capsule())
                 .overlay(
-                    Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1)
+                    Capsule()
+                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
                 )
-                .shadow(color: Color.black.opacity(0.5), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.5), radius: 8, y: 3)
             }
 
             Spacer()
@@ -358,7 +388,7 @@ public struct MainHUDView: View {
             if !isFunctionsExpanded {
                 // Estado Colapsado: Barra delgada y transparente
                 Button(action: {
-                    let haptic = UIImpactFeedbackGenerator(style: .medium)
+                    let haptic = UIImpactFeedbackGenerator(style: .light)
                     haptic.impactOccurred()
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
                         isFunctionsExpanded = true
@@ -376,8 +406,8 @@ public struct MainHUDView: View {
                             .lineSpacing(2)
                     }
                     .padding(.vertical, 14)
-                    .frame(width: 32)
-                    .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.65))
+                    .padding(.horizontal, 7)
+                    .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.75))
                     .clipShape(Capsule())
                     .overlay(
                         Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -386,7 +416,7 @@ public struct MainHUDView: View {
                 }
             } else {
                 // Estado Expandido: Botones de Funciones Rápidas
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     // Botón para colapsar
                     Button(action: {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
@@ -396,7 +426,7 @@ public struct MainHUDView: View {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(.white.opacity(0.6))
-                            .frame(width: 38, height: 26)
+                            .frame(width: 38, height: 24)
                     }
 
                     Divider().background(Color.white.opacity(0.2))
@@ -411,7 +441,17 @@ public struct MainHUDView: View {
                         isExploded.toggle()
                     }
 
-                    // 2. Rayos X / Aislamiento
+                    // 2. Encender / Simular Flujo Operativo
+                    dockButton(
+                        icon: isSimulating ? "bolt.fill" : "power",
+                        label: isSimulating ? "Activo" : "Encender",
+                        isActive: isSimulating,
+                        activeColor: Color(red: 16/255, green: 185/255, blue: 129/255)
+                    ) {
+                        isSimulating.toggle()
+                    }
+
+                    // 3. Rayos X / Aislamiento
                     dockButton(
                         icon: isXRayActive ? "viewfinder.circle.fill" : "viewfinder.circle",
                         label: "Rayos X",
@@ -421,17 +461,17 @@ public struct MainHUDView: View {
                         isXRayActive.toggle()
                     }
 
-                    // 3. Materiales Reales vs Holograma
+                    // 4. Materiales Reales vs Holograma
                     dockButton(
                         icon: isHologram ? "sparkles" : "cube.fill",
-                        label: isHologram ? "Holograma" : "Real PBR",
+                        label: isHologram ? "Holo" : "Real",
                         isActive: isHologram,
                         activeColor: Color.cyan
                     ) {
                         isHologram.toggle()
                     }
 
-                    // 4. Centrar Cámara
+                    // 5. Centrar Cámara
                     dockButton(
                         icon: "scope",
                         label: "Centrar",
@@ -444,7 +484,7 @@ public struct MainHUDView: View {
                 .padding(.vertical, 12)
                 .padding(.horizontal, 6)
                 .frame(width: 56)
-                .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.88))
+                .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.90))
                 .clipShape(RoundedRectangle(cornerRadius: 18))
                 .overlay(
                     RoundedRectangle(cornerRadius: 18)
@@ -465,54 +505,61 @@ public struct MainHUDView: View {
         }) {
             VStack(spacing: 3) {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(isActive ? activeColor : Color.white.opacity(0.8))
-                    .frame(width: 36, height: 36)
-                    .background(isActive ? activeColor.opacity(0.2) : Color.white.opacity(0.06))
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle().stroke(isActive ? activeColor : Color.clear, lineWidth: 1)
-                    )
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(isActive ? activeColor : .white.opacity(0.75))
 
                 Text(label)
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundColor(isActive ? activeColor : Color.white.opacity(0.7))
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundColor(isActive ? activeColor : .white.opacity(0.6))
+                    .lineLimit(1)
             }
+            .frame(width: 44, height: 42)
+            .background(isActive ? activeColor.opacity(0.18) : Color.white.opacity(0.04))
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isActive ? activeColor.opacity(0.6) : Color.white.opacity(0.08), lineWidth: 1)
+            )
         }
     }
 
-    // MARK: - Toast Discreto de Conexión
+    // MARK: - Toast de Conexión
     private var connectionToast: some View {
         HStack(spacing: 8) {
-            Image(systemName: apiService.isConnected ? "checkmark.circle.fill" : "wifi.slash")
-                .foregroundColor(apiService.isConnected ? .green : .red)
-            Text(apiService.isConnected ? "Odiseo Conectado (100.117.169.38)" : "Sin conexión con Odiseo")
-                .font(.system(size: 11, weight: .medium))
+            Circle()
+                .fill(apiService.isConnected ? Color.green : Color.red)
+                .frame(width: 8, height: 8)
+
+            Text(apiService.isConnected ? "Conectado a Odiseo (100.117.169.38)" : "Modo Offline (Caché local)")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.white)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 7)
-        .background(Color(red: 15/255, green: 22/255, blue: 36/255).opacity(0.95))
+        .padding(.vertical, 8)
+        .background(Color(red: 11/255, green: 17/255, blue: 28/255).opacity(0.95))
         .clipShape(Capsule())
-        .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 0.8))
+        .overlay(
+            Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1)
+        )
+        .shadow(radius: 8)
     }
 
-    // MARK: - Modal de Selección de Modelos 3D
+    // MARK: - Sheet de Selección de Modelos
     private var modelPickerSheet: some View {
         NavigationView {
             ZStack {
-                Color(red: 7/255, green: 11/255, blue: 18/255)
-                    .ignoresSafeArea()
+                Color(red: 7/255, green: 11/255, blue: 18/255).ignoresSafeArea()
 
-                VStack(spacing: 14) {
+                VStack(spacing: 0) {
                     ScrollView {
-                        LazyVStack(spacing: 10) {
+                        LazyVStack(spacing: 12) {
                             ForEach(Array(apiService.blueprints.enumerated()), id: \.element.id) { index, bp in
                                 Button(action: {
                                     let haptic = UIImpactFeedbackGenerator(style: .medium)
                                     haptic.impactOccurred()
                                     selectedBlueprintIndex = index
                                     selectedPart = nil
+                                    isSimulating = false
                                     isModelPickerPresented = false
                                 }) {
                                     HStack(spacing: 12) {

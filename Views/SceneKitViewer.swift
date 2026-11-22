@@ -1,6 +1,6 @@
 //
 //  SceneKitViewer.swift
-//  Hefesto - Visor 3D Metal / SceneKit con Despiece y Aislamiento Rayos-X
+//  Hefesto - Visor 3D Metal / SceneKit con Despiece, Rayos-X y Simulación de Flujo / Encendido
 //
 
 import SwiftUI
@@ -13,6 +13,7 @@ public struct SceneKitViewer: UIViewRepresentable {
     public let isHologram: Bool
     public let isExploded: Bool
     public let isXRayActive: Bool
+    public let isSimulating: Bool
     public let cameraResetTrigger: Int
 
     public init(
@@ -21,6 +22,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         isHologram: Bool,
         isExploded: Bool,
         isXRayActive: Bool,
+        isSimulating: Bool,
         cameraResetTrigger: Int
     ) {
         self.blueprint = blueprint
@@ -28,6 +30,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         self.isHologram = isHologram
         self.isExploded = isExploded
         self.isXRayActive = isXRayActive
+        self.isSimulating = isSimulating
         self.cameraResetTrigger = cameraResetTrigger
     }
 
@@ -54,7 +57,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         cameraNode.name = "MainCamera"
         scene.rootNode.addChildNode(cameraNode)
 
-        // Iluminación de estudio
+        // Iluminación de estudio PBR
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
@@ -98,6 +101,7 @@ public struct SceneKitViewer: UIViewRepresentable {
 
         context.coordinator.updateExplosion(isExploded: isExploded)
         context.coordinator.updateHighlight(selectedPart: selectedPart, isHologram: isHologram, isXRayActive: isXRayActive)
+        context.coordinator.updateSimulation(isSimulating: isSimulating)
 
         if context.coordinator.lastResetTrigger != cameraResetTrigger {
             context.coordinator.lastResetTrigger = cameraResetTrigger
@@ -113,6 +117,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         var originalTransforms: [String: SCNVector3] = [:]
         var lastResetTrigger: Int = 0
         var currentBlueprintId: String = ""
+        var isCurrentlySimulating: Bool = false
 
         init(_ parent: SceneKitViewer) {
             self.parent = parent
@@ -124,6 +129,7 @@ public struct SceneKitViewer: UIViewRepresentable {
             modelRootNode?.removeFromParentNode()
             partNodes.removeAll()
             originalTransforms.removeAll()
+            isCurrentlySimulating = false
 
             Task { @MainActor in
                 do {
@@ -146,6 +152,7 @@ public struct SceneKitViewer: UIViewRepresentable {
                     // Aplicar estado inicial
                     self.updateExplosion(isExploded: self.parent.isExploded)
                     self.updateHighlight(selectedPart: self.parent.selectedPart, isHologram: self.parent.isHologram, isXRayActive: self.parent.isXRayActive)
+                    self.updateSimulation(isSimulating: self.parent.isSimulating)
                 } catch {
                     print("Error cargando USDZ local: \(error)")
                 }
@@ -180,8 +187,63 @@ public struct SceneKitViewer: UIViewRepresentable {
             SCNTransaction.commit()
         }
 
-        func updateHighlight(selectedPart: BlueprintPart?, isHologram: Bool, isXRayActive: Bool) {
+        func updateSimulation(isSimulating: Bool) {
             guard let root = modelRootNode else { return }
+            if isCurrentlySimulating == isSimulating { return }
+            isCurrentlySimulating = isSimulating
+
+            if isSimulating {
+                // Activar efectos operativos en tiempo real
+                root.enumerateHierarchy { (node, _) in
+                    let name = (node.name ?? "").lowercased()
+
+                    // 1. Piezas Rotativas (Rotores, ventiladores, poleas, engranajes, turbinas)
+                    if name.contains("rotor") || name.contains("fan") || name.contains("ventilador") ||
+                       name.contains("polea") || name.contains("shaft") || name.contains("eje") ||
+                       name.contains("gear") || name.contains("ailes") {
+                        let rotate = SCNAction.rotateBy(x: 0, y: CGFloat.pi * 2, z: 0, duration: 0.6)
+                        node.runAction(SCNAction.repeatForever(rotate), forKey: "op_rotation")
+                    }
+
+                    // 2. Fuego / Quemador / Chispa / Ignición
+                    if name.contains("quemador") || name.contains("spark") || name.contains("electrodo") ||
+                       name.contains("fuego") || name.contains("ignicion") || name.contains("calefon") {
+                        let heatPulse = CABasicAnimation(keyPath: "emission.contents")
+                        heatPulse.fromValue = UIColor(red: 1.0, green: 0.25, blue: 0.0, alpha: 0.7)
+                        heatPulse.toValue = UIColor(red: 1.0, green: 0.85, blue: 0.1, alpha: 1.0)
+                        heatPulse.duration = 0.2
+                        heatPulse.autoreverses = true
+                        heatPulse.repeatCount = .infinity
+                        node.geometry?.firstMaterial?.addAnimation(heatPulse, forKey: "op_heat")
+                    }
+
+                    // 3. Flujo Hidráulico, Conducción Eléctrica, Radiofrecuencia / Antenas
+                    if name.contains("serpentin") || name.contains("agua") || name.contains("gas") ||
+                       name.contains("tubo") || name.contains("antena") || name.contains("estator") ||
+                       name.contains("bobin") || name.contains("soc") || name.contains("wifi") ||
+                       name.contains("filter") {
+                        let flowPulse = CABasicAnimation(keyPath: "emission.contents")
+                        flowPulse.fromValue = UIColor(red: 0.0, green: 0.35, blue: 1.0, alpha: 0.25)
+                        flowPulse.toValue = UIColor(red: 0.0, green: 0.95, blue: 1.0, alpha: 0.85)
+                        flowPulse.duration = 0.65
+                        flowPulse.autoreverses = true
+                        flowPulse.repeatCount = .infinity
+                        node.geometry?.firstMaterial?.addAnimation(flowPulse, forKey: "op_flow")
+                    }
+                }
+            } else {
+                // Detener animación y restaurar estado pasivo
+                root.enumerateHierarchy { (node, _) in
+                    node.removeAction(forKey: "op_rotation")
+                    node.geometry?.firstMaterial?.removeAnimation(forKey: "op_heat")
+                    node.geometry?.firstMaterial?.removeAnimation(forKey: "op_flow")
+                    node.geometry?.firstMaterial?.emission.contents = UIColor.black
+                }
+            }
+        }
+
+        func updateHighlight(selectedPart: BlueprintPart?, isHologram: Bool, isXRayActive: Bool) {
+            guard let _ = modelRootNode else { return }
 
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.35
