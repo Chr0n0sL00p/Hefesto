@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0F6C2B7CA9AB4E9EA7537C96"
+               BlueprintIdentifier = "552E38C17DBB47C28B65AE0B"
                BuildableName = "Hefesto.app"
                BlueprintName = "Hefesto"
                ReferencedContainer = "container:Hefesto.xcodeproj">
@@ -44,7 +44,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0F6C2B7CA9AB4E9EA7537C96"
+            BlueprintIdentifier = "552E38C17DBB47C28B65AE0B"
             BuildableName = "Hefesto.app"
             BlueprintName = "Hefesto"
             ReferencedContainer = "container:Hefesto.xcodeproj">
@@ -61,7 +61,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0F6C2B7CA9AB4E9EA7537C96"
+            BlueprintIdentifier = "552E38C17DBB47C28B65AE0B"
             BuildableName = "Hefesto.app"
             BlueprintName = "Hefesto"
             ReferencedContainer = "container:Hefesto.xcodeproj">

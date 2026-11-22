@@ -7,33 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D3948B4083FF43B5A3D00C26 /* HefestoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D53E27866EF40209EE786AF /* HefestoApp.swift */; };
-		E4F93C1AF3E84101A27E90DA /* BlueprintModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70CD1A1B13E149C999F59D62 /* BlueprintModels.swift */; };
-		C8BCBCDE504C4A57A2DAD309 /* OdiseoAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0450F76B480042308E78D659 /* OdiseoAPIService.swift */; };
-		397AE902EAC0416D950AAAEA /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D68874AD5B4A8C82BE1DB4 /* CatalogView.swift */; };
-		A1D22FCF91534892AE01A936 /* BlueprintDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDE76BD34C244DD95D8DECF /* BlueprintDetailView.swift */; };
-		B510AC15529E4B00A37D8703 /* SceneKitViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94FD4F9BD754D859BA02297 /* SceneKitViewer.swift */; };
-		C4EEE77EB6E34C42B7898A0C /* InspectorCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0BDE69D8F349B98E53985D /* InspectorCardView.swift */; };
-		9E0C3E2561FE4629AA1C9F49 /* ARQuickLookPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2674D147E3845499B533653 /* ARQuickLookPresenter.swift */; };
-		D3235ADFFC584678B4A83377 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68C402173EFE460CA6766EFA /* Assets.xcassets */; };
+		AA3E4D71E3A24C218EC46DCD /* HefestoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4A450E6F3E4A8B8E74C4D2 /* HefestoApp.swift */; };
+		EB4FE4165F3F4670A942400B /* BlueprintModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E131F0EBAC41F3BED2EE8C /* BlueprintModels.swift */; };
+		42992D1D5D8A454DBD4D5D63 /* OdiseoAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3957A17C76834F7F8805B9E8 /* OdiseoAPIService.swift */; };
+		48A600FBC62C4D2BA924ACDC /* SceneKitViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B965B36FC7784B7894C4A76B /* SceneKitViewer.swift */; };
+		B0705648B5174DD8986C637E /* MainHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31480522480344FBA733CC34 /* MainHUDView.swift */; };
+		DBB9B60D7D6E408BB0C53A0C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C450F2CEC0134DAFBDDAC35C /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		483B8CAAAE6B474EB93AC842 /* Hefesto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hefesto.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D53E27866EF40209EE786AF /* HefestoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/HefestoApp.swift"; sourceTree = "<group>"; };
-		70CD1A1B13E149C999F59D62 /* BlueprintModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/BlueprintModels.swift"; sourceTree = "<group>"; };
-		0450F76B480042308E78D659 /* OdiseoAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/OdiseoAPIService.swift"; sourceTree = "<group>"; };
-		C0D68874AD5B4A8C82BE1DB4 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CatalogView.swift"; sourceTree = "<group>"; };
-		3FDE76BD34C244DD95D8DECF /* BlueprintDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/BlueprintDetailView.swift"; sourceTree = "<group>"; };
-		C94FD4F9BD754D859BA02297 /* SceneKitViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/SceneKitViewer.swift"; sourceTree = "<group>"; };
-		3A0BDE69D8F349B98E53985D /* InspectorCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/InspectorCardView.swift"; sourceTree = "<group>"; };
-		F2674D147E3845499B533653 /* ARQuickLookPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ARQuickLookPresenter.swift"; sourceTree = "<group>"; };
-		D41781F9E51B4E60B34E7C32 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		68C402173EFE460CA6766EFA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		695BD0CFC3DE49D8AE35CB3A /* Hefesto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hefesto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB4A450E6F3E4A8B8E74C4D2 /* HefestoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/HefestoApp.swift"; sourceTree = "<group>"; };
+		20E131F0EBAC41F3BED2EE8C /* BlueprintModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/BlueprintModels.swift"; sourceTree = "<group>"; };
+		3957A17C76834F7F8805B9E8 /* OdiseoAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/OdiseoAPIService.swift"; sourceTree = "<group>"; };
+		B965B36FC7784B7894C4A76B /* SceneKitViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/SceneKitViewer.swift"; sourceTree = "<group>"; };
+		31480522480344FBA733CC34 /* MainHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/MainHUDView.swift"; sourceTree = "<group>"; };
+		F86185CF92994890B13971DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C450F2CEC0134DAFBDDAC35C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		79CD7D4546F341C58921DDA4 /* Frameworks */ = {
+		AE56CA8A24F441D9A46FF30A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -43,35 +37,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		27DCCFF554934F259DEC1637 = {
+		78E1966B635A4791B84B82AA = {
 			isa = PBXGroup;
 			children = (
-				24F1FC2BB35E463B858E421A /* Hefesto */,
-				B6F9DF0914904B6C863D100D /* Products */,
+				CE1C21B0751D4471948F31F0 /* Hefesto */,
+				0738D7B744B24BCC82F41F88 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		B6F9DF0914904B6C863D100D /* Products */ = {
+		0738D7B744B24BCC82F41F88 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				483B8CAAAE6B474EB93AC842 /* Hefesto.app */,
+				695BD0CFC3DE49D8AE35CB3A /* Hefesto.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		24F1FC2BB35E463B858E421A /* Hefesto */ = {
+		CE1C21B0751D4471948F31F0 /* Hefesto */ = {
 			isa = PBXGroup;
 			children = (
-				4D53E27866EF40209EE786AF /* HefestoApp.swift */,
-				70CD1A1B13E149C999F59D62 /* BlueprintModels.swift */,
-				0450F76B480042308E78D659 /* OdiseoAPIService.swift */,
-				C0D68874AD5B4A8C82BE1DB4 /* CatalogView.swift */,
-				3FDE76BD34C244DD95D8DECF /* BlueprintDetailView.swift */,
-				C94FD4F9BD754D859BA02297 /* SceneKitViewer.swift */,
-				3A0BDE69D8F349B98E53985D /* InspectorCardView.swift */,
-				F2674D147E3845499B533653 /* ARQuickLookPresenter.swift */,
-				68C402173EFE460CA6766EFA /* Assets.xcassets */,
-				D41781F9E51B4E60B34E7C32 /* Info.plist */,
+				EB4A450E6F3E4A8B8E74C4D2 /* HefestoApp.swift */,
+				20E131F0EBAC41F3BED2EE8C /* BlueprintModels.swift */,
+				3957A17C76834F7F8805B9E8 /* OdiseoAPIService.swift */,
+				B965B36FC7784B7894C4A76B /* SceneKitViewer.swift */,
+				31480522480344FBA733CC34 /* MainHUDView.swift */,
+				C450F2CEC0134DAFBDDAC35C /* Assets.xcassets */,
+				F86185CF92994890B13971DC /* Info.plist */,
 			);
 			name = Hefesto;
 			sourceTree = "<group>";
@@ -79,13 +70,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0F6C2B7CA9AB4E9EA7537C96 /* Hefesto */ = {
+		552E38C17DBB47C28B65AE0B /* Hefesto */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EA979F0CBCB843F4958B23D3 /* Build configuration list for PBXNativeTarget "Hefesto" */;
+			buildConfigurationList = BB4F35E367194268971978B8 /* Build configuration list for PBXNativeTarget "Hefesto" */;
 			buildPhases = (
-				F66185D5983F4118AB486227 /* Sources */,
-				79CD7D4546F341C58921DDA4 /* Frameworks */,
-				D92C01070D4B44549D669FB4 /* Resources */,
+				36CD60ABB10545A199B93FFF /* Sources */,
+				AE56CA8A24F441D9A46FF30A /* Frameworks */,
+				EA6E9196E94E4EDF8CA1C55F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -93,24 +84,24 @@
 			);
 			name = Hefesto;
 			productName = Hefesto;
-			productReference = 483B8CAAAE6B474EB93AC842 /* Hefesto.app */;
+			productReference = 695BD0CFC3DE49D8AE35CB3A /* Hefesto.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		E4D57C5E54224BAEA291BA78 /* Project object */ = {
+		D649E9AED1784EE9A7BE6100 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
-					0F6C2B7CA9AB4E9EA7537C96 = {
+					552E38C17DBB47C28B65AE0B = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
-			buildConfigurationList = D587B57D38E2436A92F3E840 /* Build configuration list for PBXProject "Hefesto" */;
+			buildConfigurationList = AEF4CE334E0949F1B17BCDBB /* Build configuration list for PBXProject "Hefesto" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -118,47 +109,44 @@
 				en,
 				Base,
 			);
-			mainGroup = 27DCCFF554934F259DEC1637;
-			productRefGroup = B6F9DF0914904B6C863D100D /* Products */;
+			mainGroup = 78E1966B635A4791B84B82AA;
+			productRefGroup = 0738D7B744B24BCC82F41F88 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0F6C2B7CA9AB4E9EA7537C96 /* Hefesto */,
+				552E38C17DBB47C28B65AE0B /* Hefesto */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D92C01070D4B44549D669FB4 /* Resources */ = {
+		EA6E9196E94E4EDF8CA1C55F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3235ADFFC584678B4A83377 /* Assets.xcassets in Resources */,
+				DBB9B60D7D6E408BB0C53A0C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		F66185D5983F4118AB486227 /* Sources */ = {
+		36CD60ABB10545A199B93FFF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3948B4083FF43B5A3D00C26 /* HefestoApp.swift in Sources */,
-				E4F93C1AF3E84101A27E90DA /* BlueprintModels.swift in Sources */,
-				C8BCBCDE504C4A57A2DAD309 /* OdiseoAPIService.swift in Sources */,
-				397AE902EAC0416D950AAAEA /* CatalogView.swift in Sources */,
-				A1D22FCF91534892AE01A936 /* BlueprintDetailView.swift in Sources */,
-				B510AC15529E4B00A37D8703 /* SceneKitViewer.swift in Sources */,
-				C4EEE77EB6E34C42B7898A0C /* InspectorCardView.swift in Sources */,
-				9E0C3E2561FE4629AA1C9F49 /* ARQuickLookPresenter.swift in Sources */,
+				AA3E4D71E3A24C218EC46DCD /* HefestoApp.swift in Sources */,
+				EB4FE4165F3F4670A942400B /* BlueprintModels.swift in Sources */,
+				42992D1D5D8A454DBD4D5D63 /* OdiseoAPIService.swift in Sources */,
+				48A600FBC62C4D2BA924ACDC /* SceneKitViewer.swift in Sources */,
+				B0705648B5174DD8986C637E /* MainHUDView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		7245C87DF6814B6386F24B5F /* Debug */ = {
+		F3AA8489FF664E0EBC928AEC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -183,7 +171,7 @@
 			};
 			name = Debug;
 		};
-		CE97D31438984E18A4E1F3C1 /* Release */ = {
+		9FF67655759442AF9EABABA5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -203,7 +191,7 @@
 			};
 			name = Release;
 		};
-		28A1758898474263B4F5E53A /* Debug */ = {
+		C2618F9BA7A94C138D55CB1F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -227,7 +215,7 @@
 			};
 			name = Debug;
 		};
-		1647EBAD504C454B84D2615B /* Release */ = {
+		8402FEAAEA30406399F6EBD5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -254,20 +242,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D587B57D38E2436A92F3E840 /* Build configuration list for PBXProject "Hefesto" */ = {
+		AEF4CE334E0949F1B17BCDBB /* Build configuration list for PBXProject "Hefesto" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7245C87DF6814B6386F24B5F /* Debug */,
-				CE97D31438984E18A4E1F3C1 /* Release */,
+				F3AA8489FF664E0EBC928AEC /* Debug */,
+				9FF67655759442AF9EABABA5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EA979F0CBCB843F4958B23D3 /* Build configuration list for PBXNativeTarget "Hefesto" */ = {
+		BB4F35E367194268971978B8 /* Build configuration list for PBXNativeTarget "Hefesto" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				28A1758898474263B4F5E53A /* Debug */,
-				1647EBAD504C454B84D2615B /* Release */,
+				C2618F9BA7A94C138D55CB1F /* Debug */,
+				8402FEAAEA30406399F6EBD5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -275,5 +263,5 @@
 /* End XCConfigurationList section */
 
 	};
-	rootObject = E4D57C5E54224BAEA291BA78 /* Project object */;
+	rootObject = D649E9AED1784EE9A7BE6100 /* Project object */;
 }

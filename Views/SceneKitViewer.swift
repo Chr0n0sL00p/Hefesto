@@ -12,7 +12,7 @@ public struct SceneKitViewer: UIViewRepresentable {
     @Binding public var selectedPart: BlueprintPart?
     public let isHologram: Bool
     public let isExploded: Bool
-    public let isFlowActive: Bool
+    public let isXRayActive: Bool
     public let cameraResetTrigger: Int
 
     public init(
@@ -20,14 +20,14 @@ public struct SceneKitViewer: UIViewRepresentable {
         selectedPart: Binding<BlueprintPart?>,
         isHologram: Bool,
         isExploded: Bool,
-        isFlowActive: Bool,
+        isXRayActive: Bool,
         cameraResetTrigger: Int
     ) {
         self.blueprint = blueprint
         self._selectedPart = selectedPart
         self.isHologram = isHologram
         self.isExploded = isExploded
-        self.isFlowActive = isFlowActive
+        self.isXRayActive = isXRayActive
         self.cameraResetTrigger = cameraResetTrigger
     }
 
@@ -37,7 +37,7 @@ public struct SceneKitViewer: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> SCNView {
         let scnView = SCNView()
-        scnView.backgroundColor = UIColor(red: 4/255, green: 7/255, blue: 13/255, alpha: 1.0)
+        scnView.backgroundColor = UIColor(red: 5/255, green: 8/255, blue: 14/255, alpha: 1.0)
         scnView.allowsCameraControl = true
         scnView.antialiasingMode = .multisampling4X
         scnView.autoenablesDefaultLighting = false
@@ -45,20 +45,20 @@ public struct SceneKitViewer: UIViewRepresentable {
         let scene = SCNScene()
         scnView.scene = scene
 
-        // Cámara
+        // Cámara principal
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
         cameraNode.camera?.zNear = 0.1
         cameraNode.camera?.zFar = 100
-        cameraNode.position = SCNVector3(0, 0.5, 10.5)
+        cameraNode.position = SCNVector3(0, 0.4, 9.5)
         cameraNode.name = "MainCamera"
         scene.rootNode.addChildNode(cameraNode)
 
-        // Iluminación
+        // Iluminación de estudio
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
-        ambientLight.light?.color = UIColor(white: 0.45, alpha: 1.0)
+        ambientLight.light?.color = UIColor(white: 0.5, alpha: 1.0)
         scene.rootNode.addChildNode(ambientLight)
 
         let dirLight = SCNNode()
@@ -78,7 +78,7 @@ public struct SceneKitViewer: UIViewRepresentable {
         fillLight.position = SCNVector3(-6, -4, -4)
         scene.rootNode.addChildNode(fillLight)
 
-        // Gestor de toques (Tap Raycasting)
+        // Gestor de toques para selección de partes y deselección
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
         scnView.addGestureRecognizer(tapGesture)
         context.coordinator.scnView = scnView
@@ -90,9 +90,13 @@ public struct SceneKitViewer: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: SCNView, context: Context) {
+        if context.coordinator.currentBlueprintId != blueprint.id {
+            context.coordinator.currentBlueprintId = blueprint.id
+            context.coordinator.loadModel()
+        }
+
         context.coordinator.updateExplosion(isExploded: isExploded)
-        context.coordinator.updateHighlight(selectedPart: selectedPart, isHologram: isHologram)
-        context.coordinator.updateFlow(isFlowActive: isFlowActive)
+        context.coordinator.updateHighlight(selectedPart: selectedPart, isHologram: isHologram, isXRayActive: isXRayActive)
 
         if context.coordinator.lastResetTrigger != cameraResetTrigger {
             context.coordinator.lastResetTrigger = cameraResetTrigger
@@ -107,13 +111,19 @@ public struct SceneKitViewer: UIViewRepresentable {
         var partNodes: [String: SCNNode] = [:]
         var originalTransforms: [String: SCNVector3] = [:]
         var lastResetTrigger: Int = 0
-        var selectionBoxNode: SCNNode?
+        var currentBlueprintId: String = ""
 
         init(_ parent: SceneKitViewer) {
             self.parent = parent
+            self.currentBlueprintId = parent.blueprint.id
         }
 
         func loadModel() {
+            // Limpiar modelo previo si existe
+            modelRootNode?.removeFromParentNode()
+            partNodes.removeAll()
+            originalTransforms.removeAll()
+
             Task { @MainActor in
                 do {
                     let localUrl = try await OdiseoAPIService.shared.getLocalUsdzUrl(for: parent.blueprint)
@@ -134,7 +144,7 @@ public struct SceneKitViewer: UIViewRepresentable {
 
                     // Aplicar estado inicial
                     self.updateExplosion(isExploded: self.parent.isExploded)
-                    self.updateHighlight(selectedPart: self.parent.selectedPart, isHologram: self.parent.isHologram)
+                    self.updateHighlight(selectedPart: self.parent.selectedPart, isHologram: self.parent.isHologram, isXRayActive: self.parent.isXRayActive)
                 } catch {
                     print("Error cargando USDZ local: \(error)")
                 }
@@ -169,14 +179,14 @@ public struct SceneKitViewer: UIViewRepresentable {
             SCNTransaction.commit()
         }
 
-        func updateHighlight(selectedPart: BlueprintPart?, isHologram: Bool) {
+        func updateHighlight(selectedPart: BlueprintPart?, isHologram: Bool, isXRayActive: Bool) {
             guard let root = modelRootNode else { return }
 
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.35
 
             if let selected = selectedPart {
-                // Aislamiento / Ghosting: atenuar todas las demás al 20%
+                // Modo Aislamiento / Ghosting: atenuar no seleccionadas al 20%
                 for part in parent.blueprint.parts {
                     guard let node = partNodes[part.key] else { continue }
                     let isSelected = (part.key == selected.key)
@@ -189,13 +199,13 @@ public struct SceneKitViewer: UIViewRepresentable {
                                 child.geometry?.firstMaterial?.emission.contents = UIColor.cyan
                                 child.geometry?.firstMaterial?.fillMode = .lines
                             } else {
-                                child.geometry?.firstMaterial?.emission.contents = UIColor(red: 0.1, green: 0.6, blue: 1.0, alpha: 0.6)
+                                child.geometry?.firstMaterial?.emission.contents = UIColor(red: 0.1, green: 0.7, blue: 1.0, alpha: 0.6)
                                 child.geometry?.firstMaterial?.fillMode = .fill
                             }
                         } else {
-                            // Ghosting atenuado
-                            child.opacity = isHologram ? 0.12 : 0.22
-                            child.geometry?.firstMaterial?.transparency = 0.22
+                            // Ghosting atenuado al 20%
+                            child.opacity = isHologram ? 0.12 : 0.20
+                            child.geometry?.firstMaterial?.transparency = 0.20
                             child.geometry?.firstMaterial?.emission.contents = UIColor.black
                             if isHologram {
                                 child.geometry?.firstMaterial?.fillMode = .lines
@@ -205,8 +215,18 @@ public struct SceneKitViewer: UIViewRepresentable {
                         }
                     }
                 }
+            } else if isXRayActive {
+                // Rayos X general activo sin selección específica
+                for (_, node) in partNodes {
+                    node.enumerateHierarchy { (child, _) in
+                        child.opacity = 0.35
+                        child.geometry?.firstMaterial?.transparency = 0.35
+                        child.geometry?.firstMaterial?.emission.contents = UIColor.cyan
+                        child.geometry?.firstMaterial?.fillMode = .lines
+                    }
+                }
             } else {
-                // Sin selección: todo 100% visible
+                // Sin selección ni rayos X: todo al 100% visible
                 for (_, node) in partNodes {
                     node.enumerateHierarchy { (child, _) in
                         child.opacity = 1.0
@@ -220,23 +240,11 @@ public struct SceneKitViewer: UIViewRepresentable {
             SCNTransaction.commit()
         }
 
-        func updateFlow(isFlowActive: Bool) {
-            // Animación suave de pulsación operativa
-            guard isFlowActive, let root = modelRootNode else { return }
-            let pulse = CABasicAnimation(keyPath: "scale")
-            pulse.duration = 0.8
-            pulse.fromValue = NSValue(scnVector3: SCNVector3(1.0, 1.0, 1.0))
-            pulse.toValue = NSValue(scnVector3: SCNVector3(1.02, 1.02, 1.02))
-            pulse.autoreverses = true
-            pulse.repeatCount = .infinity
-            root.addAnimation(pulse, forKey: "flowPulse")
-        }
-
         func resetCamera() {
             guard let camera = scnView?.scene?.rootNode.childNode(withName: "MainCamera", recursively: false) else { return }
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.5
-            camera.position = SCNVector3(0, 0.5, 10.5)
+            camera.position = SCNVector3(0, 0.4, 9.5)
             camera.eulerAngles = SCNVector3Zero
             SCNTransaction.commit()
         }
@@ -252,18 +260,28 @@ public struct SceneKitViewer: UIViewRepresentable {
                     if let name = current?.name {
                         for part in parent.blueprint.parts {
                             if name.lowercased().contains(part.key.lowercased()) || part.key.lowercased().contains(name.lowercased()) {
-                                // Taptic feedback nativo de iPhone 16
                                 let generator = UIImpactFeedbackGenerator(style: .medium)
                                 generator.impactOccurred()
 
                                 DispatchQueue.main.async {
-                                    self.parent.selectedPart = part
+                                    if self.parent.selectedPart?.key == part.key {
+                                        self.parent.selectedPart = nil
+                                    } else {
+                                        self.parent.selectedPart = part
+                                    }
                                 }
                                 return
                             }
                         }
                     }
                     current = current?.parent
+                }
+            } else {
+                // Tocar en el espacio vacío deselecciona la pieza
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
+                DispatchQueue.main.async {
+                    self.parent.selectedPart = nil
                 }
             }
         }

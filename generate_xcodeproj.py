@@ -36,11 +36,8 @@ def create_xcodeproj(project_dir="/home/snow/Hefesto"):
         ("HefestoApp.swift", "App/HefestoApp.swift"),
         ("BlueprintModels.swift", "Models/BlueprintModels.swift"),
         ("OdiseoAPIService.swift", "Services/OdiseoAPIService.swift"),
-        ("CatalogView.swift", "Views/CatalogView.swift"),
-        ("BlueprintDetailView.swift", "Views/BlueprintDetailView.swift"),
         ("SceneKitViewer.swift", "Views/SceneKitViewer.swift"),
-        ("InspectorCardView.swift", "Views/InspectorCardView.swift"),
-        ("ARQuickLookPresenter.swift", "Views/ARQuickLookPresenter.swift")
+        ("MainHUDView.swift", "Views/MainHUDView.swift")
     ]
 
     file_refs = []
@@ -295,7 +292,7 @@ def create_xcodeproj(project_dir="/home/snow/Hefesto"):
         f.write(content)
     print(f"Hefesto.xcodeproj generado exitosamente en: {pbx_path}")
 
-    # Create shared scheme
+    # Shared scheme
     xcscheme_dir = os.path.join(xcodeproj_dir, "xcshareddata", "xcschemes")
     os.makedirs(xcscheme_dir, exist_ok=True)
     scheme_path = os.path.join(xcscheme_dir, "Hefesto.xcscheme")

@@ -11,7 +11,7 @@ public struct HefestoApp: App {
 
     public var body: some Scene {
         WindowGroup {
-            CatalogView()
+            MainHUDView()
                 .preferredColorScheme(.dark)
         }
     }
