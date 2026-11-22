@@ -8,21 +8,14 @@ on:
 jobs:
   build:
     name: Build Hefesto IPA
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Show Xcode Version
         run: |
-          if [ -d "/Applications/Xcode_15.2.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_15.2.app
-          elif [ -d "/Applications/Xcode_15.1.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_15.1.app
-          elif [ -d "/Applications/Xcode_15.0.1.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_15.0.1.app
-          fi
           xcodebuild -version
 
       - name: Build and Archive
