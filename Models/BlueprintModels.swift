@@ -40,23 +40,121 @@ public struct Blueprint: Identifiable, Codable, Hashable {
         case stat2ValOff = "stat2_val_off"
         case phases, parts
     }
+
+    public init(
+        id: String,
+        title: String,
+        subtitle: String,
+        norm: String,
+        usdzUrl: String,
+        htmlUrl: String,
+        flowBtnLabel: String,
+        flowStateOn: String,
+        flowStateOff: String,
+        stat1Label: String,
+        stat1ValOn: String,
+        stat1ValOff: String,
+        stat2Label: String,
+        stat2ValOn: String,
+        stat2ValOff: String,
+        phases: [String],
+        parts: [BlueprintPart]
+    ) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.norm = norm
+        self.usdzUrl = usdzUrl
+        self.htmlUrl = htmlUrl
+        self.flowBtnLabel = flowBtnLabel
+        self.flowStateOn = flowStateOn
+        self.flowStateOff = flowStateOff
+        self.stat1Label = stat1Label
+        self.stat1ValOn = stat1ValOn
+        self.stat1ValOff = stat1ValOff
+        self.stat2Label = stat2Label
+        self.stat2ValOn = stat2ValOn
+        self.stat2ValOff = stat2ValOff
+        self.phases = phases
+        self.parts = parts
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.title = try container.decodeIfPresent(String.self, forKey: .title) ?? "Modelo CAD"
+        self.subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Subconjunto de Ingeniería"
+        self.norm = try container.decodeIfPresent(String.self, forKey: .norm) ?? "ISO 9001 / SEC Chile"
+        self.usdzUrl = try container.decodeIfPresent(String.self, forKey: .usdzUrl) ?? ""
+        self.htmlUrl = try container.decodeIfPresent(String.self, forKey: .htmlUrl) ?? ""
+        self.flowBtnLabel = try container.decodeIfPresent(String.self, forKey: .flowBtnLabel) ?? "Simular Flujo"
+        self.flowStateOn = try container.decodeIfPresent(String.self, forKey: .flowStateOn) ?? "ESTADO: ACTIVO"
+        self.flowStateOff = try container.decodeIfPresent(String.self, forKey: .flowStateOff) ?? "ESTADO: REPOSO"
+        self.stat1Label = try container.decodeIfPresent(String.self, forKey: .stat1Label) ?? "ESTADO"
+        self.stat1ValOn = try container.decodeIfPresent(String.self, forKey: .stat1ValOn) ?? "100%"
+        self.stat1ValOff = try container.decodeIfPresent(String.self, forKey: .stat1ValOff) ?? "0%"
+        self.stat2Label = try container.decodeIfPresent(String.self, forKey: .stat2Label) ?? "SERVICIO"
+        self.stat2ValOn = try container.decodeIfPresent(String.self, forKey: .stat2ValOn) ?? "OPTIMO"
+        self.stat2ValOff = try container.decodeIfPresent(String.self, forKey: .stat2ValOff) ?? "REPOSO"
+        self.phases = try container.decodeIfPresent([String].self, forKey: .phases) ?? []
+        self.parts = try container.decodeIfPresent([BlueprintPart].self, forKey: .parts) ?? []
+    }
 }
 
 public struct BlueprintPart: Identifiable, Codable, Hashable {
-    public let id: String        // "PIEZA 01"
-    public let key: String       // "Serpentin_Cobre"
-    public let name: String      // "Serpentín de Cobre & Aletas"
-    public let subsystem: String // "Intercambiador de Calor Primario"
-    public let material: String  // "Cobre electrolítico Cu-DHP..."
-    public let function: String  // "Transfiere instantáneamente..."
-    public let failure: String   // "Incrustación de sarro..."
-    public let posAssembled: [Float] // [x, y, z]
-    public let posExploded: [Float]  // [x, y, z]
+    public let id: String
+    public let key: String
+    public let name: String
+    public let subsystem: String
+    public let material: String
+    public let function: String
+    public let failure: String
+    public let posAssembled: [Float]
+    public let posExploded: [Float]
 
     enum CodingKeys: String, CodingKey {
-        case id, key, name, subsystem, material, function, failure
+        case id, key, name, subsystem, material, function, funcKey = "func", failure
         case posAssembled = "pos_assembled"
         case posExploded = "pos_exploded"
+    }
+
+    public init(
+        id: String,
+        key: String,
+        name: String,
+        subsystem: String,
+        material: String,
+        function: String,
+        failure: String,
+        posAssembled: [Float],
+        posExploded: [Float]
+    ) {
+        self.id = id
+        self.key = key
+        self.name = name
+        self.subsystem = subsystem
+        self.material = material
+        self.function = function
+        self.failure = failure
+        self.posAssembled = posAssembled
+        self.posExploded = posExploded
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.key = try container.decodeIfPresent(String.self, forKey: .key) ?? UUID().uuidString
+        self.id = try container.decodeIfPresent(String.self, forKey: .id) ?? "PIEZA"
+        self.name = try container.decodeIfPresent(String.self, forKey: .name) ?? self.key
+        self.subsystem = try container.decodeIfPresent(String.self, forKey: .subsystem) ?? "Subsistema Funcional"
+        self.material = try container.decodeIfPresent(String.self, forKey: .material) ?? "Aleación Metálica / Polímero"
+        
+        let funcDirect = try container.decodeIfPresent(String.self, forKey: .function)
+        let funcAlt = try container.decodeIfPresent(String.self, forKey: .funcKey)
+        self.function = funcDirect ?? funcAlt ?? "Componente de precisión para operación mecánica."
+        
+        self.failure = try container.decodeIfPresent(String.self, forKey: .failure) ?? "Desgaste normal por fatiga mecánica o térmica."
+        self.posAssembled = try container.decodeIfPresent([Float].self, forKey: .posAssembled) ?? [0.0, 0.0, 0.0]
+        self.posExploded = try container.decodeIfPresent([Float].self, forKey: .posExploded) ?? [0.0, 1.0, 0.0]
     }
 
     public var assembledVector: SCNVector3 {
