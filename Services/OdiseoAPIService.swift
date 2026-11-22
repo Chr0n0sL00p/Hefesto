@@ -125,7 +125,18 @@ public class OdiseoAPIService: ObservableObject {
             throw URLError(.badURL)
         }
 
-        let (tempUrl, _) = try await URLSession.shared.download(from: remoteUrl)
+        let (tempUrl, response) = try await URLSession.shared.download(from: remoteUrl)
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            try? fileManager.removeItem(at: tempUrl)
+            throw URLError(.badServerResponse)
+        }
+
+        if let attrs = try? fileManager.attributesOfItem(atPath: tempUrl.path),
+           let size = attrs[.size] as? Int64, size < 5_000 {
+            try? fileManager.removeItem(at: tempUrl)
+            throw URLError(.cannotParseResponse)
+        }
+
         if fileManager.fileExists(atPath: localFile.path) {
             try? fileManager.removeItem(at: localFile)
         }

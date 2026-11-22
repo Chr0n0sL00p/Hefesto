@@ -150,25 +150,26 @@ public struct SceneKitViewer: UIViewRepresentable {
                         root.addChildNode(child)
                     }
 
-                    // 1. Centrar pivote y normalizar escala de cualquier modelo USDZ importado
-                    let (minVec, maxVec) = root.boundingBox
-                    let dx = maxVec.x - minVec.x
-                    let dy = maxVec.y - minVec.y
-                    let dz = maxVec.z - minVec.z
-                    let maxDim = max(dx, max(dy, dz))
+                    // 1. Centrar pivote y normalizar escala de cualquier modelo USDZ importado inspeccionando la jerarquía completa
+                    if let bounds = Self.calculateHierarchyBoundingBox(for: root) {
+                        let dx = bounds.max.x - bounds.min.x
+                        let dy = bounds.max.y - bounds.min.y
+                        let dz = bounds.max.z - bounds.min.z
+                        let maxDim = max(dx, max(dy, dz))
 
-                    if maxDim > 0.001 {
-                        let centerX = (minVec.x + maxVec.x) / 2.0
-                        let centerY = (minVec.y + maxVec.y) / 2.0
-                        let centerZ = (minVec.z + maxVec.z) / 2.0
+                        if maxDim > 0.001 {
+                            let centerX = (bounds.min.x + bounds.max.x) / 2.0
+                            let centerY = (bounds.min.y + bounds.max.y) / 2.0
+                            let centerZ = (bounds.min.z + bounds.max.z) / 2.0
 
-                        // Centrar pivote en el centro real de la masa del objeto
-                        root.pivot = SCNMatrix4MakeTranslation(centerX, centerY, centerZ)
+                            // Centrar pivote en el centro real de la masa del objeto
+                            root.pivot = SCNMatrix4MakeTranslation(centerX, centerY, centerZ)
 
-                        // Escalar para que quepa en un cubo visible de ~5.0 unidades
-                        let targetSize: Float = 5.0
-                        let scaleFactor = targetSize / maxDim
-                        root.scale = SCNVector3(scaleFactor, scaleFactor, scaleFactor)
+                            // Escalar para que quepa en un cubo visible de ~4.5 unidades
+                            let targetSize: Float = 4.5
+                            let scaleFactor = targetSize / maxDim
+                            root.scale = SCNVector3(scaleFactor, scaleFactor, scaleFactor)
+                        }
                     }
 
                     self.scnView?.scene?.rootNode.addChildNode(root)
@@ -187,10 +188,54 @@ public struct SceneKitViewer: UIViewRepresentable {
             }
         }
 
+        private static func calculateHierarchyBoundingBox(for node: SCNNode) -> (min: SCNVector3, max: SCNVector3)? {
+            var minX = Float.greatestFiniteMagnitude
+            var minY = Float.greatestFiniteMagnitude
+            var minZ = Float.greatestFiniteMagnitude
+            var maxX = -Float.greatestFiniteMagnitude
+            var maxY = -Float.greatestFiniteMagnitude
+            var maxZ = -Float.greatestFiniteMagnitude
+            var found = false
+
+            node.enumerateHierarchy { (child, _) in
+                if child.geometry != nil {
+                    let (cMin, cMax) = child.boundingBox
+                    if cMin.x != cMax.x || cMin.y != cMax.y || cMin.z != cMax.z {
+                        found = true
+                        let corners = [
+                            SCNVector3(cMin.x, cMin.y, cMin.z),
+                            SCNVector3(cMax.x, cMin.y, cMin.z),
+                            SCNVector3(cMin.x, cMax.y, cMin.z),
+                            SCNVector3(cMax.x, cMax.y, cMin.z),
+                            SCNVector3(cMin.x, cMin.y, cMax.z),
+                            SCNVector3(cMax.x, cMin.y, cMax.z),
+                            SCNVector3(cMin.x, cMax.y, cMax.z),
+                            SCNVector3(cMax.x, cMax.y, cMax.z)
+                        ]
+                        for corner in corners {
+                            let p = child.convertPosition(corner, to: node)
+                            minX = min(minX, p.x)
+                            minY = min(minY, p.y)
+                            minZ = min(minZ, p.z)
+                            maxX = max(maxX, p.x)
+                            maxY = max(maxY, p.y)
+                            maxZ = max(maxZ, p.z)
+                        }
+                    }
+                }
+            }
+
+            if found {
+                return (min: SCNVector3(minX, minY, minZ), max: SCNVector3(maxX, maxY, maxZ))
+            }
+            return nil
+        }
+
         private func mapNodes(node: SCNNode) {
             if let name = node.name {
                 let lowerName = name.lowercased()
                 for part in parent.blueprint.parts {
+                    if partNodes[part.key] != nil { continue }
                     let lowerKey = part.key.lowercased()
                     if lowerName == lowerKey || lowerName.contains(lowerKey) || lowerKey.contains(lowerName) {
                         partNodes[part.key] = node
