@@ -46,6 +46,7 @@ public struct MainHUDView: View {
                     isXRayActive: isXRayActive,
                     cameraResetTrigger: cameraResetTrigger
                 )
+                .id(blueprint.id)
                 .ignoresSafeArea()
             } else {
                 VStack(spacing: 12) {

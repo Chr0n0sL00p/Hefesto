@@ -90,6 +90,39 @@ public class OdiseoAPIService: ObservableObject {
                     BlueprintPart(id: "PIEZA 06", key: "Puertos_RJ45", name: "Módulo de Puertos RJ45 Blindados", subsystem: "Conectividad WAN / LAN Gigabit", material: "Carcasa de aleación de zinc niquelada con contactos chapados en oro de 50 micropulgadas y transformador magnético pulse.", function: "Aislamiento galvánico de 1.500V RMS y acoplamiento balanceado para tramas Ethernet 10/100/1000/2.5G Base-T.", failure: "Contactos sulfatados o dañados: El puerto negocia a 100 Mbps en lugar de 1000 Mbps por pérdida de continuidad en pares 4-5 o 7-8.", posAssembled: [-1.4, 0.3, -1.3], posExploded: [-3.0, 0.6, -2.6]),
                     BlueprintPart(id: "PIEZA 07", key: "Chasis_Inferior", name: "Chasis Inferior & Topes Antivibración", subsystem: "Base Mecánica & Anclaje Mural", material: "Base de ABS inyectado con patas de goma de silicona antideslizante y ranuras VESA para montaje vertical.", function: "Soporta el ensamble completo, provee soporte estructural y disipa el calor residual por convección natural inferior.", failure: "Topes degradados por calor, vibraciones transmitidas a la mesa de trabajo.", posAssembled: [0.0, -0.6, 0.0], posExploded: [0.0, -2.2, 0.0])
                 ]
+            ),
+            Blueprint(
+                id: "bujia",
+                title: "Bujía de Encendido Iridium (NGK Laser Type)",
+                subtitle: "Sistema de Ignición por Descarga de Alta Tensión (25 kV)",
+                norm: "Norma SAE J548 · ISO 11565 · Grado Térmico 7",
+                usdzUrl: "http://100.117.169.38:4550/blueprint/bujia.usdz",
+                htmlUrl: "http://100.117.169.38:4550/blueprint/bujia",
+                flowBtnLabel: "Chispa de Ignición",
+                flowStateOn: "DESCARGA ACTIVA (ARCO DE 25.000V)",
+                flowStateOff: "REPOSO (SIN TENSIÓN DE BOBINA)",
+                stat1Label: "VOLTAJE",
+                stat1ValOn: "24.8 kV",
+                stat1ValOff: "0.0 kV",
+                stat2Label: "GAP CHISPA",
+                stat2ValOn: "1.05 mm",
+                stat2ValOff: "1.05 mm",
+                phases: [
+                    "Carga Inductiva: La bobina primaria satura su núcleo magnético controlada por el transistor IGBT de la ECU.",
+                    "Colapso de Campo: Al cortar la corriente primaria, se induce una f.e.m. de hasta 25.000V en el secundario.",
+                    "Ruptura Dieléctrica: El alto potencial vence la resistencia de la mezcla aire/gasolina comprimida a 14 bar.",
+                    "Descarga de Plasma: El arco térmico a 3.000°C inicia el núcleo de combustión esférico y autopropagado."
+                ],
+                parts: [
+                    BlueprintPart(id: "PIEZA 01", key: "Terminal_Conexion", name: "Terminal de Conexión SAE", subsystem: "Acople de Alta Tensión", material: "Acero al carbono maquinado con recubrimiento de níquel electrolítico resistente a vibración.", function: "Conecta mecánicamente con el capuchón de silicona de la bobina individual (Coil-on-Plug) transfiriendo el pulso de 25kV.", failure: "Terminal suelto o con sulfato: Provoca caídas de tensión y arcos parásitos externos con tirones en aceleración.", posAssembled: [0.0, 3.2, 0.0], posExploded: [0.0, 5.0, 0.0]),
+                    BlueprintPart(id: "PIEZA 02", key: "Aislador_Ceramico", name: "Aislador Cerámico de Alúmina 95%", subsystem: "Barrera Dieléctrica y Térmica", material: "Cerámica técnica de óxido de aluminio (Al2O3 al 95%) sinterizado a 1.600°C con 5 nervaduras antifuga.", function: "Soporta una rigidez dieléctrica de hasta 30kV sin perforación eléctrica y disipa el calor hacia la culata.", failure: "Fisura en aislador por torque excesivo: La chispa se deriva a la masa de la culata; falla de encendido (misfire).", posAssembled: [0.0, 1.9, 0.0], posExploded: [0.0, 3.6, 0.0]),
+                    BlueprintPart(id: "PIEZA 03", key: "Resistor_Supresor", name: "Resistor Cerámico Anti-RFI (5 kΩ)", subsystem: "Supresión de Ruido Electromagnético", material: "Compuesto vítreo de partículas de carbono y borosilicato sellado dentro del núcleo aislante.", function: "Amortigua las oscilaciones de radiofrecuencia (RFI/EMI) protegiendo la computadora del vehículo (ECU) y sensores.", failure: "Resistor abierto o degradado: Resistencia mayor a 10 kΩ; chispa débil o nula imposibilitando el arranque.", posAssembled: [0.0, 0.9, 0.0], posExploded: [1.4, 1.2, 0.0]),
+                    BlueprintPart(id: "PIEZA 04", key: "Cuerpo_Hexagonal", name: "Cuerpo Roscado & Hexágono de 16mm", subsystem: "Fijación Mecánica & Disipación Térmica", material: "Acero estructural SAE 1010 forjado en frío con tratamiento anticorrosivo de zincado bicromatado.", function: "Permite el apriete dinamométrico (25-30 Nm) a la culata y transfiere el 80% del calor hacia el refrigerante.", failure: "Rosca barrida o agarrotada por no respetar el par de apriete: Daño severo al alojamiento en la culata.", posAssembled: [0.0, 0.0, 0.0], posExploded: [0.0, 0.0, 0.0]),
+                    BlueprintPart(id: "PIEZA 05", key: "Junta_Estanqueidad", name: "Junta de Asiento / Golilla Deformable", subsystem: "Sellado de Cámara de Combustión", material: "Arandela hueca de acero plegado o cobre laminado de deformación plástica programada.", function: "Sella presiones dinámicas de más de 60 bar generadas durante la combustión y asegura el contacto térmico.", failure: "Arandela reutilizada aplastada: Fuga de compresión, silbido audible y recalentamiento de la bujía.", posAssembled: [0.0, -0.65, 0.0], posExploded: [0.0, -1.8, 0.0]),
+                    BlueprintPart(id: "PIEZA 06", key: "Rosca_Metrica", name: "Rosca Métrica M14 x 1.25", subsystem: "Anclaje Roscado en Culata", material: "Mecanizado por rolado de precisión para evitar rebabas y microgrietas en los filetes.", function: "Cierra el circuito eléctrico a masa con el block del motor y fija rígidamente la bujía dentro de la cámara.", failure: "Carbonilla acumulada en filetes: Resistencia térmica alta que causa preignición (cascabeleo o pistoneo).", posAssembled: [0.0, -1.35, 0.0], posExploded: [0.0, -1.35, 0.0]),
+                    BlueprintPart(id: "PIEZA 07", key: "Electrodo_Central", name: "Electrodo Central con Micro-Punta de Iridio", subsystem: "Emisor de Plasma de Encendido", material: "Núcleo interior de cobre térmico con aguja soldada por láser de Iridio puro (punto de fusión 2.446°C, Ø 0.6 mm).", function: "Concentra el campo electrostático reduciendo en un 25% la tensión requerida para ionizar la mezcla.", failure: "Erosión severa por más de 100.000 km o combustible deficiente: Luz agrandada sobre 1.4mm; sobrecalienta la bobina.", posAssembled: [0.0, -2.1, 0.0], posExploded: [0.0, -3.2, 0.0]),
+                    BlueprintPart(id: "PIEZA 08", key: "Electrodo_Masa", name: "Electrodo de Masa Curvado (Gap 1.0mm)", subsystem: "Receptor de Masa & Expansión de Llama", material: "Aleación de Níquel-Itrio de alta resistencia a la erosión química de azufre con corte cónico.", function: "Define la separación de salto de chispa (Gap de 1.05 mm) y permite el crecimiento libre de la bola de fuego inicial.", failure: "Cierre accidental del gap por golpe en instalación o puente de carbón por aceite: El cilindro queda sin chispa.", posAssembled: [0.35, -2.4, 0.0], posExploded: [1.5, -3.4, 0.0])
+                ]
             )
         ]
     }

@@ -90,6 +90,7 @@ public struct SceneKitViewer: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: SCNView, context: Context) {
+        context.coordinator.parent = self
         if context.coordinator.currentBlueprintId != blueprint.id {
             context.coordinator.currentBlueprintId = blueprint.id
             context.coordinator.loadModel()
